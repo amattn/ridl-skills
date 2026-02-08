@@ -1,0 +1,387 @@
+---
+name: prd
+description: "Generate a comprehensive Product Requirements Document (PRD). This skill should be used when the user asks to 'create a prd', 'write a prd', 'plan this feature', 'write requirements for', 'spec out', 'create a product spec', or 'write a requirements doc'. Produces detailed, human-readable PRDs with requirement tables, technical architecture, user flows, and release milestones."
+user-invocable: true
+---
+
+# Comprehensive PRD Generator
+
+Generate detailed Product Requirements Documents that are thorough, well-structured, and suitable for both human stakeholders and development teams.
+
+---
+
+## The Job
+
+1. Receive a feature or product description from the user
+2. Ask 3-5 essential clarifying questions (with lettered options)
+3. Generate a draft PRD based on answers
+4. **Per-feature acceptance criteria review:** Present each feature area's requirements to the user and ask if they want to adjust, add, or remove specific acceptance criteria before finalizing
+5. Incorporate feedback and save to `ridl/prd.md`
+
+**Important:** Do NOT start implementing. Just create the PRD.
+
+---
+
+## Step 1: Clarifying Questions
+
+Ask only critical questions where the initial prompt is ambiguous. Focus on:
+
+- **Problem/Goal:** What problem does this solve?
+- **Platform/Stack:** What platform and technology stack?
+- **Core Functionality:** What are the key capabilities?
+- **Scope/Boundaries:** What should it NOT do?
+- **Users:** Who are the target users?
+
+### Format Questions Like This:
+
+```
+1. What is the primary platform?
+   A. macOS native (Swift/SwiftUI)
+   B. iOS (Swift/SwiftUI)
+   C. Web (React/Next.js)
+   D. Other: [please specify]
+
+2. Who is the primary target user?
+   A. End consumers
+   B. Internal team / enterprise
+   C. Developers / technical users
+   D. All of the above
+
+3. What is the scope for v1.0?
+   A. Minimal viable product
+   B. Full-featured initial release
+   C. Just the backend/API
+   D. Just the UI
+```
+
+This lets users respond with "1A, 2C, 3B" for quick iteration. Remember to indent the options.
+
+---
+
+## Step 2: PRD Structure
+
+Generate the PRD with the following sections. Use markdown tables for requirements. Every functional requirement gets an **ID**, **description**, and **priority** (P0 = must-have, P1 = should-have, P2 = nice-to-have).
+
+### Header Block
+
+```markdown
+# Product Requirements Document: [Product Name]
+
+## [Subtitle / Tagline]
+
+**Version:** 1.0
+**Date:** [Today's date]
+**Platform:** [Target platform and version]
+**Language:** [Primary language / framework]
+
+---
+```
+
+### 1. Overview
+
+Brief description of the product/feature and the problem it solves (1-2 paragraphs).
+
+Include a **Design Principles** subsection with 3-5 bullet points capturing the guiding philosophy (e.g., "Privacy-first", "Low-friction", "Performance").
+
+### 2. User Personas
+
+A markdown table with columns: Persona, Description, Key Need.
+
+Include 3-5 personas that represent the target users.
+
+**Format:**
+```markdown
+| Persona | Description | Key Need |
+|---------|-------------|----------|
+| **Role Name** | Brief description | What they need most |
+```
+
+### 3. Functional Requirements
+
+Group requirements by subsystem or feature area. Each group gets its own subsection with a markdown table.
+
+**Format:**
+```markdown
+### 3.1 [Feature Area]
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| XX-1 | Specific, unambiguous requirement | P0 |
+| XX-2 | Another requirement | P1 |
+```
+
+**ID Prefixes:** Use short, descriptive prefixes per feature area (e.g., AC = Audio Capture, UI = User Interface, RC = Recording Controls).
+
+**Requirement writing rules:**
+- Each requirement is a single, testable statement
+- Be explicit and unambiguous
+- Specify exact values where possible (sizes, durations, formats)
+- Avoid vague language ("fast", "easy", "good")
+
+**Priority levels:**
+- **P0:** Must-have for initial release. Product is broken without it.
+- **P1:** Should-have. Important but can ship without it briefly.
+- **P2:** Nice-to-have. Deferred is acceptable.
+
+#### UI Requirements
+
+For sections with significant UI, include an ASCII wireframe showing the layout:
+
+```
+┌─────────────────────────────────────┐
+│  [Toolbar area]                      │
+├──────────┬──────────────────────────┤
+│ Left     │ Right                     │
+│ Pane     │ Pane                      │
+│          │                           │
+└──────────┴──────────────────────────┘
+```
+
+### 4. Non-Functional Requirements
+
+Organize into subsections: Performance, Privacy & Security, Compatibility.
+
+**Performance requirements** use a table with ID, Requirement, and Target columns.
+
+**Privacy/Security and Compatibility** use a table with ID and Requirement columns.
+
+### 5. Technical Architecture
+
+Include two subsections:
+
+**5.1 High-Level Component Diagram** — ASCII diagram showing major components and their relationships using box-drawing characters.
+
+**5.2 Key Dependencies** — Table with columns: Component, Library/Framework, Notes.
+
+If relevant, include a **processing pipeline** diagram showing data flow.
+
+### 6. Developer Experience
+
+Define requirements for how the codebase, tooling, and runtime behavior support both **human developers** and **coding agents** (LLM-driven autonomous agents like RIDL). DX requirements span documentation, readability, debuggability, and error handling.
+
+Organize into subsections:
+
+**6.1 Error Handling & User-Facing Errors**
+
+Errors shown to users must be clear, actionable, and copy-friendly. Requirements should address:
+
+- Error messages include a short summary, a unique error code, and contextual details (what failed, why, what to try)
+- A one-click "Copy error details" button that copies the error code, message, and relevant context to the clipboard for easy pasting into bug reports or search
+- Errors distinguish between user-correctable problems and internal failures
+- Error strings are greppable — unique enough to locate the exact throw site in the codebase
+
+**6.2 Debuggability**
+
+Define how the product supports runtime inspection and troubleshooting:
+
+- A **Debug Mode** toggle in Settings that enables additional diagnostic UI (e.g., a debug info pane or overlay window showing internal state, recent events, and timing data)
+- Structured logging with severity levels and consistent key-value formatting that is parseable by both humans and tools
+- Sufficient log context to diagnose issues from logs alone without requiring a debugger session
+
+**6.3 Code Readability & Agent-Friendliness**
+
+Define standards that make the codebase easy to navigate for humans and effective for coding agents:
+
+- Consistent naming conventions and file organization so agents can locate code by convention
+- Public APIs and module boundaries have doc comments describing purpose, parameters, and return values
+- Complex logic includes inline rationale comments explaining **why**, not **what**
+- Avoid clever abstractions that obscure control flow — prefer explicit, traceable code paths
+- Strict linting and formatting rules enforced via CI — all code must pass the project linter and formatter with zero warnings before merge
+
+**Format:**
+```markdown
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| DX-1 | All user-facing errors display a short summary, unique error code, and a "Copy error details" button that copies code + context to clipboard | P0 |
+| DX-2 | Settings includes a Debug Mode toggle that enables a debug info pane showing internal state and recent events | P1 |
+| DX-3 | All log output uses structured key-value format with severity levels | P1 |
+| DX-4 | Public module APIs have doc comments covering purpose, parameters, and return values | P1 |
+| DX-5 | Error strings are unique and greppable to locate the exact throw site in source | P1 |
+| DX-6 | All code must pass the project linter and formatter with zero warnings; enforced via CI pre-merge check | P0 |
+```
+
+**ID Prefix:** DX = Developer Experience.
+
+### 7. Settings
+
+If the product has user-configurable settings:
+
+Include an ASCII mockup of the settings UI layout.
+
+Include a **Settings Reference** table with columns: Setting, Type, Default, Description.
+
+### 8. User Flows
+
+Describe 2-4 key user flows as numbered step sequences. Each flow gets a title and a short walkthrough of the user's experience.
+
+### 9. Release Milestones
+
+Break the project into incremental releases:
+
+```markdown
+### v0.1 — [Theme]
+- Bullet list of features/capabilities
+
+### v0.2 — [Theme]
+- Bullet list of features/capabilities
+```
+
+Each milestone should be a shippable increment. Earlier milestones contain P0 requirements; later milestones add P1/P2 features.
+
+### 10. Resolved Questions
+
+A table documenting key design decisions that were made:
+
+```markdown
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | Should X support Y? | **Decision.** Rationale. |
+```
+
+If there are unresolved questions, list them in an **Open Questions** section instead.
+
+Open questions are important and Claude should ask the user one by one how to resolve them.
+
+### 11. Critical Test Areas
+
+Identify functionality that is high-risk, error-prone, or catastrophic if broken — and therefore needs heavy test coverage. This section helps the team prioritize testing effort.
+
+For each critical area, include:
+- **What:** The specific functionality or subsystem
+- **Why it's critical:** What goes wrong if this breaks (data loss, security breach, silent corruption, etc.)
+- **Suggested test approach:** Unit tests, integration tests, fuzz testing, property-based tests, stress tests, manual QA, etc.
+
+**Format:**
+```markdown
+| Area | Risk if broken | Suggested test approach |
+|------|---------------|----------------------|
+| Data persistence layer | Data loss, corrupted state | Unit tests for every CRUD path, integration tests with real DB, edge cases (empty input, max length, concurrent writes) |
+| Audio processing pipeline | Silent failures, garbled output | Property-based tests on sample rates, stress test with long recordings, regression tests with known audio files |
+| Authentication flow | Security breach, account lockout | Unit tests for every auth state, integration tests for token refresh, penetration testing |
+```
+
+**How to identify critical areas:**
+
+Analyze the requirements and flag functionality that matches any of these patterns:
+
+- **Core functionality:** The primary value proposition of the product — the thing users came for. If this doesn't work, nothing else matters. (e.g., transcription accuracy in a transcription app, search results in a search engine, payment processing in an e-commerce app)
+- **Data integrity:** Anything that writes, transforms, or deletes user data
+- **Security boundaries:** Authentication, authorization, input validation, encryption
+- **State machines:** Complex state transitions where invalid states cause failures (e.g., recording → paused → stopped)
+- **External integrations:** API calls, file I/O, hardware interfaces where failures are unpredictable
+- **Concurrent operations:** Race conditions, thread safety, shared resource access
+- **Performance-sensitive paths:** Hot loops, real-time processing, anything with latency targets in the NFRs
+
+Present this analysis to the user and ask them to confirm or adjust which areas they consider critical.
+
+### 12. Success Metrics
+
+A table with columns: Metric, Target.
+
+Define measurable criteria for success (performance benchmarks, error rates, adoption targets).
+
+---
+
+## Step 3: Per-Feature Acceptance Criteria Review
+
+After generating the draft PRD, present each feature area to the user for review before finalizing. For each feature section (e.g., 3.1 Audio Capture, 3.2 VAD, etc.):
+
+1. Show the feature area name and its requirements table
+2. Ask the user:
+   - Are these requirements correct and complete?
+   - Should any requirements be added, removed, or modified?
+   - Are the priorities right?
+3. Incorporate feedback before moving to the next feature area
+
+### Format the review like this:
+
+```
+### Feature: [Feature Area Name]
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| XX-1 | Requirement text | P0 |
+| XX-2 | Requirement text | P1 |
+
+Anything to add, change, or remove for this feature area?
+(Reply "ok" to approve as-is and move to the next section)
+```
+
+This step ensures the user has granular control over every feature's acceptance criteria. Skip this step only if the user explicitly says to generate the full PRD without review.
+
+### Critical Test Areas Review
+
+After reviewing all feature areas, present the Critical Test Areas analysis. For each area identified:
+
+1. Explain **what** the critical area is and **why** it's high-risk
+2. Propose a test approach
+3. Ask the user:
+   - Does this belong on the critical list?
+   - Are there other areas they consider critical that were missed?
+   - Do they agree with the suggested test approach?
+
+```
+### Critical Test Areas
+
+| Area | Risk if broken | Suggested test approach |
+|------|---------------|----------------------|
+| [Area 1] | [Risk] | [Approach] |
+| [Area 2] | [Risk] | [Approach] |
+
+Are these the right critical areas? Anything to add or remove?
+(Reply "ok" to approve as-is)
+```
+
+---
+
+## Writing Guidelines
+
+- Be explicit and unambiguous
+- Use concrete values, not vague qualifiers
+- Every requirement should be independently testable
+- Number all requirements for easy reference
+- Use ASCII diagrams for architecture and UI layouts
+- Group related requirements logically by feature area
+- Write for the development team — include enough technical detail to implement
+
+---
+
+## Output
+
+- **Format:** Markdown (`.md`)
+- **Filename:** `prd.md`
+- **Location:** `ridl/` directory at the project root
+
+Create the `ridl/` directory if it does not exist.
+
+---
+
+## Pipeline Context
+
+This skill is step 1 in the RIDL pipeline. All files live in `ridl/`:
+
+```
+/ridl-skills:prd      →  ridl/prd.md      (comprehensive PRD)  ← you are here
+/ridl-skills:ridlmd   →  ridl/ridl.md     (agent-sized user stories)
+/ridl-skills:ridljson  →  ridl/ridl.json   (JSON for autonomous loop)
+```
+
+---
+
+## Checklist
+
+Before saving the PRD:
+
+- [ ] Asked clarifying questions with lettered options
+- [ ] Incorporated user's answers
+- [ ] All requirements have IDs and priorities
+- [ ] Requirement tables use consistent ID prefixes per section
+- [ ] Non-functional requirements include measurable targets
+- [ ] Technical architecture has component diagram
+- [ ] Release milestones break work into shippable increments
+- [ ] Resolved/open questions documented
+- [ ] Success metrics are measurable
+- [ ] Developer experience section covers error handling, debuggability, and agent-friendliness
+- [ ] Critical test areas identified and reviewed with user
+- [ ] Per-feature acceptance criteria reviewed with user
+- [ ] Saved to `ridl/prd.md`

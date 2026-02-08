@@ -1,0 +1,21 @@
+{
+  "name": "ridl-marketplace",
+  "owner": {
+    "name": "amattn"
+  },
+  "metadata": {
+    "description": "PRD generation and conversion skills for the RIDL autonomous agent system",
+    "version": "1.0.1"
+  },
+  "plugins": [
+    {
+      "name": "ridl-skills",
+      "source": "./",
+      "description": "PRD generation and conversion skills for the RIDL autonomous agent loop",
+      "version": "1.0.1",
+      "keywords": ["ridl", "prd", "automation", "agent", "planning"],
+      "category": "productivity",
+      "skills": "./skills/"
+    }
+  ]
+}
