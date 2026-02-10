@@ -12,7 +12,7 @@
       "name": "ridl-skills",
       "source": "./",
       "description": "PRD generation and conversion skills for the RIDL autonomous agent loop",
-      "version": "1.0.2",
+      "version": "1.1.0",
       "keywords": ["ridl", "prd", "automation", "agent", "planning"],
       "category": "productivity",
       "skills": "./skills/"

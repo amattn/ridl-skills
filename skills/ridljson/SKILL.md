@@ -1,6 +1,6 @@
 ---
 name: ridljson
-version: 1.0.2
+version: 1.1.0
 description: "Convert ridl.md to ridl.json format for the RIDL autonomous agent system. This skill should be used when the user asks to 'convert ridl.md', 'turn this into ridl json', 'create ridl.json', 'ridl json', 'convert ridl.md to json', or 'make ridl stories from ridl.md'."
 user-invocable: true
 ---
@@ -47,6 +47,14 @@ Always update the `version` field in the YAML frontmatter at the top of this fil
   "project": "[Project Name]",
   "branchName": "ridl/[feature-name-kebab-case]",
   "description": "[Feature description from PRD title/intro]",
+  "milestones": [
+    {
+      "id": "MS-1",
+      "version": "v0.1",
+      "theme": "[Theme]",
+      "storyIds": ["US-001", "US-002"]
+    }
+  ],
   "userStories": [
     {
       "id": "US-001",
@@ -57,6 +65,7 @@ Always update the `version` field in the YAML frontmatter at the top of this fil
         "Criterion 2",
         "Typecheck passes"
       ],
+      "milestone": "MS-1",
       "priority": 1,
       "passes": false,
       "notes": ""
@@ -148,6 +157,9 @@ Frontend stories are NOT complete until visually verified. The agent will use th
 4. **All stories**: `passes: false` and empty `notes`
 5. **branchName**: Derive from feature name, kebab-case, prefixed with `ridl/`
 6. **Always add**: "Typecheck passes" to every story's acceptance criteria
+7. **Milestones array**: If the source `ridl.md` has a `## Milestones` section, convert each milestone heading into an entry in the top-level `"milestones"` array with `id`, `version`, `theme`, and `storyIds`
+8. **Per-story milestone**: Add a `"milestone"` field to each user story object referencing its milestone ID (e.g., `"MS-1"`)
+9. **Bidirectional consistency**: Every story's `"milestone"` value must appear in `milestones[].id`, and every story ID in `milestones[].storyIds` must match a story with that `"milestone"` value
 
 ---
 
@@ -217,6 +229,16 @@ Add ability to mark tasks with different statuses.
 - [ ] Filter persists in URL params
 - [ ] Typecheck passes
 - [ ] Verify in browser using dev-browser skill
+
+## Milestones
+
+### MS-1: v0.1 — Status Data Model
+- US-001: Add status field to tasks table
+- US-002: Display status badge on task cards
+
+### MS-2: v0.2 — Status Interactions
+- US-003: Add status toggle to task list rows
+- US-004: Filter tasks by status
 ```
 
 **Output (`ridl.json`):**
@@ -226,6 +248,20 @@ Add ability to mark tasks with different statuses.
   "project": "TaskApp",
   "branchName": "ridl/task-status",
   "description": "Task Status Feature - Track task progress with status indicators",
+  "milestones": [
+    {
+      "id": "MS-1",
+      "version": "v0.1",
+      "theme": "Status Data Model",
+      "storyIds": ["US-001", "US-002"]
+    },
+    {
+      "id": "MS-2",
+      "version": "v0.2",
+      "theme": "Status Interactions",
+      "storyIds": ["US-003", "US-004"]
+    }
+  ],
   "userStories": [
     {
       "id": "US-001",
@@ -236,6 +272,7 @@ Add ability to mark tasks with different statuses.
         "Generate and run migration successfully",
         "Typecheck passes"
       ],
+      "milestone": "MS-1",
       "priority": 1,
       "passes": false,
       "notes": ""
@@ -250,6 +287,7 @@ Add ability to mark tasks with different statuses.
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
+      "milestone": "MS-1",
       "priority": 2,
       "passes": false,
       "notes": ""
@@ -265,6 +303,7 @@ Add ability to mark tasks with different statuses.
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
+      "milestone": "MS-2",
       "priority": 3,
       "passes": false,
       "notes": ""
@@ -279,6 +318,7 @@ Add ability to mark tasks with different statuses.
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
+      "milestone": "MS-2",
       "priority": 4,
       "passes": false,
       "notes": ""
@@ -325,3 +365,6 @@ Before writing ridl.json, verify:
 - [ ] UI stories have "Verify in browser using dev-browser skill" as criterion
 - [ ] Acceptance criteria are verifiable (not vague)
 - [ ] No story depends on a later story
+- [ ] Every story has a `"milestone"` field (if source ridl.md has milestones)
+- [ ] Top-level `"milestones"` array is present (if source ridl.md has milestones)
+- [ ] Bidirectional consistency: each story's `"milestone"` matches `milestones[].id`, and each `milestones[].storyIds` entry matches a story with that milestone

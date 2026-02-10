@@ -1,6 +1,6 @@
 ---
 name: ridlmd
-version: 1.0.2
+version: 1.1.0
 description: "Convert a comprehensive PRD into an agent-sized ridl.md with user stories and acceptance criteria for the RIDL autonomous agent loop. This skill should be used when the user asks to 'convert prd to ridl', 'create ridl.md', 'make ridl stories from prd', 'ridl md', 'break prd into stories', or 'convert prd to user stories'. Reads a comprehensive PRD and distills it into small, agent-sized user stories."
 user-invocable: true
 ---
@@ -54,6 +54,7 @@ Read the comprehensive PRD and identify:
 - **Dependencies** between features (schema before backend before UI)
 - **UI elements** that will need browser verification
 - **Technical architecture** details that inform implementation order
+- **Release milestones** from the PRD milestone/release schedule (Section 9)
 
 ---
 
@@ -83,6 +84,18 @@ Stories must be ordered so earlier stories never depend on later ones:
 2. Server actions / backend logic
 3. UI components that use the backend
 4. Dashboard/summary views that aggregate data
+
+### Milestone Assignment
+
+If the source PRD defines release milestones, assign each story to a milestone:
+
+1. Map each story to the feature area it implements
+2. Assign the story to the **earliest milestone** whose scope covers that feature
+3. Use the milestone IDs from the PRD (MS-1, MS-2, etc.)
+4. Every story must belong to exactly one milestone
+5. Milestone ordering must be consistent with story dependency ordering — a story in MS-2 must not be a dependency of a story in MS-1
+
+If the source PRD does not define milestones, omit the Milestones section from the output.
 
 ### Acceptance Criteria Rules
 
@@ -125,6 +138,15 @@ Each criterion must be verifiable — something an agent can CHECK, not somethin
 
 ### US-002: [Title]
 ...
+
+## Milestones
+
+### MS-1: v0.1 — [Theme]
+- US-001: [Story title]
+- US-002: [Story title]
+
+### MS-2: v0.2 — [Theme]
+- US-003: [Story title]
 
 ## Functional Requirements
 
@@ -220,5 +242,8 @@ Before saving ridl.md:
 - [ ] UI stories have "Verify in browser using dev-browser skill" as criterion
 - [ ] Acceptance criteria are verifiable (not vague)
 - [ ] No story depends on a later story
+- [ ] Every story is assigned to a milestone (if PRD defines milestones)
+- [ ] Milestones section is present and lists all stories (if PRD defines milestones)
+- [ ] Milestone ordering is consistent with story dependency ordering
 - [ ] Per-story acceptance criteria reviewed with user
 - [ ] Saved to `ridl/ridl.md`
