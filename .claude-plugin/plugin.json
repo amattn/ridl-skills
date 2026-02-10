@@ -1,6 +1,6 @@
 {
   "name": "ridl-skills",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "PRD generation and conversion skills for the RIDL autonomous agent system",
   "author": {
     "name": "amattn"

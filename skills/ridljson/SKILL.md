@@ -1,5 +1,6 @@
 ---
 name: ridljson
+version: 1.0.2
 description: "Convert ridl.md to ridl.json format for the RIDL autonomous agent system. This skill should be used when the user asks to 'convert ridl.md', 'turn this into ridl json', 'create ridl.json', 'ridl json', 'convert ridl.md to json', or 'make ridl stories from ridl.md'."
 user-invocable: true
 ---
@@ -18,10 +19,31 @@ If no `ridl/ridl.md` is found, prompt the user to either provide a path or run `
 
 ---
 
+## Versioning
+
+**Skill file versioning:** This skill uses semantic versioning (`major.minor.patch`) in the frontmatter `version` field. When Claude helps an author write or update this skill file, the version **must** be bumped before saving:
+
+- **Patch** (e.g., 1.0.1 → 1.0.2): Small changes — typo fixes, wording tweaks, minor clarifications
+- **Minor** (e.g., 1.0.2 → 1.1.0): Larger changes — adding/removing a section, changing the workflow, updating templates
+- **Major** (e.g., 1.1.0 → 2.0.0): Very large changes in scope or features — fundamental restructuring, new capabilities, breaking changes to the output format
+
+Always update the `version` field in the YAML frontmatter at the top of this file.
+
+**Output versioning:** The generated `ridl.json` **must** inherit the version from the source `ridl.md`. Read the `**Version:**` field from the ridl.md header and include it as the `"version"` field in the JSON output. This keeps the pipeline artifacts in sync — `ridl.json` always tracks the ridl.md version it was generated from.
+
+**Local modification suffix:** If `ridl.json` is modified via this skill (e.g., reordering stories, tweaking criteria) but the source `ridl.md` was **not** regenerated, append a semver pre-release suffix: `-ridljson.N`, where N increments with each local edit. For example:
+
+- First local edit: `1.0.0-ridljson.1`
+- Second local edit: `1.0.0-ridljson.2`
+- Source ridl.md regenerated: version resets to the new ridl.md version (e.g., `1.0.0-ridlmd.1` or `1.1.0`) with no `-ridljson` suffix
+
+---
+
 ## Output Format
 
 ```json
 {
+  "version": "[inherited from source ridl.md]",
   "project": "[Project Name]",
   "branchName": "ridl/[feature-name-kebab-case]",
   "description": "[Feature description from PRD title/intro]",
@@ -200,6 +222,7 @@ Add ability to mark tasks with different statuses.
 **Output (`ridl.json`):**
 ```json
 {
+  "version": "1.0",
   "project": "TaskApp",
   "branchName": "ridl/task-status",
   "description": "Task Status Feature - Track task progress with status indicators",

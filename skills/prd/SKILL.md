@@ -1,5 +1,6 @@
 ---
 name: prd
+version: 1.0.2
 description: "Generate a comprehensive Product Requirements Document (PRD). This skill should be used when the user asks to 'create a prd', 'write a prd', 'plan this feature', 'write requirements for', 'spec out', 'create a product spec', or 'write a requirements doc'. Produces detailed, human-readable PRDs with requirement tables, technical architecture, user flows, and release milestones."
 user-invocable: true
 ---
@@ -19,6 +20,18 @@ Generate detailed Product Requirements Documents that are thorough, well-structu
 5. Incorporate feedback and save to `ridl/prd.md`
 
 **Important:** Do NOT start implementing. Just create the PRD.
+
+---
+
+## Versioning
+
+This skill uses semantic versioning (`major.minor.patch`) in the frontmatter `version` field. When Claude helps an author write or update this skill file, the version **must** be bumped before saving:
+
+- **Patch** (e.g., 1.0.1 → 1.0.2): Small changes — typo fixes, wording tweaks, minor clarifications
+- **Minor** (e.g., 1.0.2 → 1.1.0): Larger changes — adding/removing a section, changing the workflow, updating templates
+- **Major** (e.g., 1.1.0 → 2.0.0): Very large changes in scope or features — fundamental restructuring, new capabilities, breaking changes to the output format
+
+Always update the `version` field in the YAML frontmatter at the top of this file.
 
 ---
 
