@@ -5,7 +5,9 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:minicodemonkey.github.io)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeature: add milestone awareness to ridlmd and ridljson skills\n\nPRD skill already generates release milestones \\(Section 9\\), but this\ndata was lost during conversion. ridlmd now includes a Milestones\nsection and milestone assignment rules. ridljson adds a top-level\nmilestones array and per-story milestone field with bidirectional\nconsistency checks. Bumps plugin version to 1.1.0.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
