@@ -1,6 +1,6 @@
 ---
 name: ridlmd
-version: 2.0.0
+version: 2.1.0
 description: "Convert a comprehensive PRD into an agent-sized ridl.md with iteration definitions for the RIDL autonomous agent loop. Each iteration definition encompasses a user story and verifiable acceptance criteria. This skill should be used when the user asks to 'convert prd to ridl', 'create ridl.md', 'make ridl iterations from prd', 'ridl md', 'break prd into iterations', 'convert prd to iteration definitions', 'break prd into stories', or 'convert prd to user stories'. Reads a comprehensive PRD and distills it into small, agent-sized iteration definitions."
 user-invocable: true
 ---
@@ -121,6 +121,11 @@ If the source PRD defines release milestones, assign each iteration definition t
 4. Every iteration definition must belong to exactly one milestone
 5. Milestone ordering must be consistent with dependency ordering — an iteration definition in MS-2 must not be a dependency of one in MS-1
 
+Each milestone heading must include:
+- **Name** (required): Short label from the PRD milestone heading (e.g., "Core Data Model")
+- **Version** (required): Semver label from the PRD milestone (e.g., `v0.1`)
+- **Theme** (optional): A blockquote sentence describing the milestone's purpose, carried from the PRD if present
+
 If the source PRD does not define milestones, omit the Milestones section from the output.
 
 ### Acceptance Criteria Rules
@@ -193,11 +198,13 @@ Cross-cutting requirements that apply to ALL iteration definitions. Every agent 
 
 ## Milestones
 
-### MS-1: v0.1 — [Theme]
+### MS-1: v0.1 — [Name]
+> [Optional theme — a sentence describing the milestone's purpose]
 - ID-001: [Title]
 - ID-002: [Title]
 
-### MS-2: v0.2 — [Theme]
+### MS-2: v0.2 — [Name]
+> [Optional theme — a sentence describing the milestone's purpose]
 - ID-003: [Title]
 
 ## Functional Requirements

@@ -1,6 +1,6 @@
 ---
 name: prd
-version: 1.1.0
+version: 2.1.0
 description: "Generate a comprehensive Product Requirements Document (PRD). This skill should be used when the user asks to 'create a prd', 'write a prd', 'plan this feature', 'write requirements for', 'spec out', 'create a product spec', or 'write a requirements doc'. Produces detailed, human-readable PRDs with requirement tables, technical architecture, user flows, and release milestones."
 user-invocable: true
 ---
@@ -124,6 +124,8 @@ Group requirements by subsystem or feature area. Each group gets its own subsect
 | XX-2 | Another requirement | P1 |
 ```
 
+**ID format:** `XX-N` — a short descriptive prefix followed by a hyphen and a plain integer. No letter suffixes (e.g., `AC-2a` is invalid — use `AC-3` instead). If a requirement needs to be added between existing IDs, renumber subsequent rows.
+
 **ID Prefixes:** Use short, descriptive prefixes per feature area (e.g., AC = Audio Capture, UI = User Interface, RC = Recording Controls).
 
 **Requirement writing rules:**
@@ -233,14 +235,21 @@ Describe 2-4 key user flows as numbered step sequences. Each flow gets a title a
 Break the project into incremental releases:
 
 ```markdown
-### v0.1 — [Theme]
+### v0.1 — [Name]
+> [Optional theme — a sentence describing the milestone's purpose]
 - Bullet list of features/capabilities
 
-### v0.2 — [Theme]
+### v0.2 — [Name]
+> [Optional theme — a sentence describing the milestone's purpose]
 - Bullet list of features/capabilities
 ```
 
 Each milestone should be a shippable increment. Earlier milestones contain P0 requirements; later milestones add P1/P2 features.
+
+**Milestone fields:**
+- **Version** (required): Semver label in the heading (e.g., `v0.1`)
+- **Name** (required): Short label after the dash (e.g., "Core Data Model")
+- **Theme** (optional): A blockquote sentence on the next line describing the milestone's purpose or goal in more detail
 
 ### 10. Resolved Questions
 

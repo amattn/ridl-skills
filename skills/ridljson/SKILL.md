@@ -1,6 +1,6 @@
 ---
 name: ridljson
-version: 2.0.0
+version: 2.1.0
 description: "Convert ridl.md to ridl.json format for the RIDL autonomous agent system. This skill should be used when the user asks to 'convert ridl.md', 'turn this into ridl json', 'create ridl.json', 'ridl json', 'convert ridl.md to json', or 'make ridl iterations from ridl.md'."
 user-invocable: true
 ---
@@ -62,8 +62,9 @@ Always update the `version` field in the YAML frontmatter at the top of this fil
   "milestones": [
     {
       "id": "MS-1",
+      "name": "[Name]",
       "version": "v0.1",
-      "theme": "[Theme]",
+      "theme": "[Optional longer theme description]",
       "definitionIds": ["ID-001", "ID-002"]
     }
   ],
@@ -175,7 +176,7 @@ Frontend iteration definitions are NOT complete until visually verified. The age
 6. **Always add**: "Typecheck passes" to every iteration definition's acceptance criteria
 7. **Universal context**: Convert the `## Universal Context` section from ridl.md into the top-level `"universalContext"` object with `nonFunctionalRequirements`, `developerExperience`, and `technicalArchitecture` arrays
 8. **PRD references**: Convert each iteration definition's `**PRD References:**` list into a `"prdReferences"` array of strings (e.g., `"TE-1: User can create a new template"`)
-9. **Milestones array**: If the source `ridl.md` has a `## Milestones` section, convert each milestone heading into an entry in the top-level `"milestones"` array with `id`, `version`, `theme`, and `definitionIds`
+9. **Milestones array**: If the source `ridl.md` has a `## Milestones` section, convert each milestone heading into an entry in the top-level `"milestones"` array with `id`, `name` (required), `version` (required), `theme` (optional — include only if the source milestone has a blockquote theme line), and `definitionIds`
 10. **Per-definition milestone**: Add a `"milestone"` field to each iteration definition object referencing its milestone ID (e.g., `"MS-1"`)
 11. **Bidirectional consistency**: Every iteration definition's `"milestone"` value must appear in `milestones[].id`, and every ID in `milestones[].definitionIds` must match an iteration definition with that `"milestone"` value
 
@@ -277,10 +278,12 @@ Cross-cutting requirements that apply to ALL iteration definitions.
 ## Milestones
 
 ### MS-1: v0.1 — Status Data Model
+> Establish the foundational data layer for task status tracking
 - ID-001: Add status field to tasks table
 - ID-002: Display status badge on task cards
 
 ### MS-2: v0.2 — Status Interactions
+> Enable users to interact with and filter by task status
 - ID-003: Add status toggle to task list rows
 - ID-004: Filter tasks by status
 ```
@@ -307,14 +310,16 @@ Cross-cutting requirements that apply to ALL iteration definitions.
   "milestones": [
     {
       "id": "MS-1",
+      "name": "Status Data Model",
       "version": "v0.1",
-      "theme": "Status Data Model",
+      "theme": "Establish the foundational data layer for task status tracking",
       "definitionIds": ["ID-001", "ID-002"]
     },
     {
       "id": "MS-2",
+      "name": "Status Interactions",
       "version": "v0.2",
-      "theme": "Status Interactions",
+      "theme": "Enable users to interact with and filter by task status",
       "definitionIds": ["ID-003", "ID-004"]
     }
   ],
