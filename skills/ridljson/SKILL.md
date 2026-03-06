@@ -57,6 +57,11 @@ Always update the `version` field in the YAML frontmatter at the top of this fil
     ],
     "technicalArchitecture": [
       "Architecture constraint from source ridl.md"
+    ],
+    "testingAndVerification": [
+      "Red/green discipline: new tests must fail before implementation, pass after",
+      "Verification command from source ridl.md (e.g., npm test)",
+      "Test coverage expectation from source ridl.md"
     ]
   },
   "milestones": [
@@ -165,15 +170,16 @@ Each criterion must be something the agent can CHECK, not something vague.
 - "Good UX"
 - "Handles edge cases"
 
-### Always include as final criterion:
+### Always include on every iteration definition:
 ```
+"Tests written for [requirement IDs] (failing before implementation, passing after)"
+"Full test suite passes with no regressions"
+"[format command] produces zero changes"
+"[lint command] passes with zero warnings"
 "Typecheck passes"
 ```
 
-For iteration definitions with testable logic, also include:
-```
-"Tests pass"
-```
+Use the exact verification commands from the source ridl.md's Testing & Verification universal context section.
 
 ### For iteration definitions that change UI, also include:
 ```
@@ -192,7 +198,7 @@ Frontend iteration definitions are NOT complete until visually verified. The age
 4. **New iteration definitions**: `passes: false` and empty `notes`; **frozen definitions** (with `passes: true` in existing ridl.json) are preserved exactly as-is
 5. **branchName**: Derive from feature name, kebab-case, prefixed with `ridl/`
 6. **Always add**: "Typecheck passes" to every iteration definition's acceptance criteria
-7. **Universal context**: Convert the `## Universal Context` section from ridl.md into the top-level `"universalContext"` object with `nonFunctionalRequirements`, `developerExperience`, and `technicalArchitecture` arrays
+7. **Universal context**: Convert the `## Universal Context` section from ridl.md into the top-level `"universalContext"` object with `nonFunctionalRequirements`, `developerExperience`, `technicalArchitecture`, and `testingAndVerification` arrays
 8. **PRD references**: Convert each iteration definition's `**PRD References:**` list into a `"prdReferences"` array of strings (e.g., `"TE-1: User can create a new template"`)
 9. **Milestones array**: If the source `ridl.md` has a `## Milestones` section, convert each milestone heading into an entry in the top-level `"milestones"` array with `id`, `name` (required), `version` (required), `theme` (optional — include only if the source milestone has a blockquote theme line), and `definitionIds`
 10. **Per-definition milestone**: Add a `"milestone"` field to each iteration definition object referencing its milestone ID (e.g., `"MS-1"`)
@@ -239,6 +245,12 @@ Cross-cutting requirements that apply to ALL iteration definitions.
 ### Developer Experience
 - All code must pass linting with zero warnings
 
+### Testing & Verification
+- Red/green discipline: new tests must fail before implementation, pass after
+- Verification commands: `npm test` (test suite), `prettier --check .` (formatter), `npm run lint` (linter), `npx tsc --noEmit` (typecheck), `npm run build` (build)
+- Test names include requirement IDs (e.g., test_FR_1_status_tracking)
+- Unit tests for every new function; integration tests at component boundaries
+
 ### Technical Architecture
 - Status values stored as enum type in database
 
@@ -253,6 +265,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
 **Acceptance Criteria:**
 - [ ] Add status column: 'pending' | 'in_progress' | 'done' (default 'pending')
 - [ ] Generate and run migration successfully
+- [ ] Tests written for FR-1 (failing before implementation, passing after)
+- [ ] Full test suite passes with no regressions
+- [ ] `prettier --check .` produces zero changes
+- [ ] `npm run lint` passes with zero warnings
 - [ ] Typecheck passes
 
 ### ID-002: Display status badge on task cards
@@ -265,6 +281,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
 **Acceptance Criteria:**
 - [ ] Each task card shows colored status badge
 - [ ] Badge colors: gray=pending, blue=in_progress, green=done
+- [ ] Tests written for FR-2 and FR-3 (failing before implementation, passing after)
+- [ ] Full test suite passes with no regressions
+- [ ] `prettier --check .` produces zero changes
+- [ ] `npm run lint` passes with zero warnings
 - [ ] Typecheck passes
 - [ ] Verify in browser using dev-browser skill
 
@@ -278,6 +298,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
 - [ ] Each row has status dropdown or toggle
 - [ ] Changing status saves immediately
 - [ ] UI updates without page refresh
+- [ ] Tests written for FR-4 (failing before implementation, passing after)
+- [ ] Full test suite passes with no regressions
+- [ ] `prettier --check .` produces zero changes
+- [ ] `npm run lint` passes with zero warnings
 - [ ] Typecheck passes
 - [ ] Verify in browser using dev-browser skill
 
@@ -290,6 +314,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
 **Acceptance Criteria:**
 - [ ] Filter dropdown: All | Pending | In Progress | Done
 - [ ] Filter persists in URL params
+- [ ] Tests written for FR-5 (failing before implementation, passing after)
+- [ ] Full test suite passes with no regressions
+- [ ] `prettier --check .` produces zero changes
+- [ ] `npm run lint` passes with zero warnings
 - [ ] Typecheck passes
 - [ ] Verify in browser using dev-browser skill
 
@@ -323,6 +351,12 @@ Cross-cutting requirements that apply to ALL iteration definitions.
     ],
     "technicalArchitecture": [
       "Status values stored as enum type in database"
+    ],
+    "testingAndVerification": [
+      "Red/green discipline: new tests must fail before implementation, pass after",
+      "Verification commands: npm test (test suite), prettier --check . (formatter), npm run lint (linter), npx tsc --noEmit (typecheck), npm run build (build)",
+      "Test names include requirement IDs (e.g., test_FR_1_status_tracking)",
+      "Unit tests for every new function; integration tests at component boundaries"
     ]
   },
   "milestones": [
@@ -352,6 +386,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
       "acceptanceCriteria": [
         "Add status column: 'pending' | 'in_progress' | 'done' (default 'pending')",
         "Generate and run migration successfully",
+        "Tests written for FR-1 (failing before implementation, passing after)",
+        "Full test suite passes with no regressions",
+        "prettier --check . produces zero changes",
+        "npm run lint passes with zero warnings",
         "Typecheck passes"
       ],
       "milestone": "MS-1",
@@ -370,6 +408,9 @@ Cross-cutting requirements that apply to ALL iteration definitions.
       "acceptanceCriteria": [
         "Each task card shows colored status badge",
         "Badge colors: gray=pending, blue=in_progress, green=done",
+        "Tests written for FR-2 and FR-3 (failing before implementation, passing after)",
+        "Full test suite passes with no regressions",
+        "npm run lint passes with zero warnings",
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
@@ -389,6 +430,9 @@ Cross-cutting requirements that apply to ALL iteration definitions.
         "Each row has status dropdown or toggle",
         "Changing status saves immediately",
         "UI updates without page refresh",
+        "Tests written for FR-4 (failing before implementation, passing after)",
+        "Full test suite passes with no regressions",
+        "npm run lint passes with zero warnings",
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
@@ -407,6 +451,9 @@ Cross-cutting requirements that apply to ALL iteration definitions.
       "acceptanceCriteria": [
         "Filter dropdown: All | Pending | In Progress | Done",
         "Filter persists in URL params",
+        "Tests written for FR-5 (failing before implementation, passing after)",
+        "Full test suite passes with no regressions",
+        "npm run lint passes with zero warnings",
         "Typecheck passes",
         "Verify in browser using dev-browser skill"
       ],
@@ -453,9 +500,11 @@ Before writing ridl.json, verify:
 - [ ] **Previous run archived** (if ridl.json exists with different branchName, archive it first)
 - [ ] **Frozen definitions preserved** — all iteration definitions with `passes: true` in existing ridl.json copied verbatim
 - [ ] **No frozen definitions modified** — new requirements added as new iteration definitions, not merged into frozen ones
-- [ ] Universal context extracted into `"universalContext"` object
+- [ ] Universal context extracted into `"universalContext"` object (including `testingAndVerification` array)
 - [ ] Each iteration definition is completable in one iteration (small enough)
 - [ ] Iteration definitions are ordered by dependency (schema to backend to UI)
+- [ ] Every iteration definition has test-writing criteria (tests for new functionality, red/green, full suite passes)
+- [ ] Every iteration definition lists verification commands from universal context (test, format, lint, typecheck, build)
 - [ ] Every iteration definition has "Typecheck passes" as criterion
 - [ ] UI iteration definitions have "Verify in browser using dev-browser skill" as criterion
 - [ ] Acceptance criteria are verifiable (not vague)

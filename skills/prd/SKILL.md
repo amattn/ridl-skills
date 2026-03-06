@@ -1,6 +1,6 @@
 ---
 name: prd
-version: 2.1.0
+version: 2.2.0
 description: "Generate a comprehensive Product Requirements Document (PRD). This skill should be used when the user asks to 'create a prd', 'write a prd', 'plan this feature', 'write requirements for', 'spec out', 'create a product spec', or 'write a requirements doc'. Produces detailed, human-readable PRDs with requirement tables, technical architecture, user flows, and release milestones."
 user-invocable: true
 ---
@@ -310,7 +310,87 @@ Analyze the requirements and flag functionality that matches any of these patter
 
 Present this analysis to the user and ask them to confirm or adjust which areas they consider critical.
 
-### 12. Success Metrics
+### 12. Testing & Verification Strategy
+
+Define the project's approach to testing so that every iteration produces verifiable, high-confidence code. The goal is a **red/green testing discipline**: every behavior has a test that fails before implementation and passes after.
+
+Organize into subsections:
+
+**12.1 Red/Green Testing Requirements**
+
+Every iteration must include tests that verify its acceptance criteria. Tests are written (or outlined) **before** implementation so that:
+
+1. **Red:** The test exists and fails, proving it actually tests the new behavior
+2. **Green:** Implementation makes the test pass
+3. **Regression-safe:** All previous tests still pass after the new iteration
+
+Requirements should address:
+
+- Every functional requirement (section 3) must have at least one corresponding automated test
+- Tests must be runnable via a single command (e.g., `make test`, `npm test`, `pytest`) with no manual setup beyond initial project bootstrap
+- The full test suite must pass before any iteration is considered complete
+- Test names must clearly map back to requirement IDs (e.g., `test_AC_1_captures_audio`, `test_UI_3_shows_error_state`) so failures are immediately traceable to requirements
+- Tests must be deterministic — no flaky tests, no order-dependent tests, no reliance on external services without mocks
+
+**12.2 Test Coverage Expectations**
+
+Define minimum coverage targets and what kinds of tests are expected:
+
+| Test Type | When Required | Example |
+|-----------|--------------|---------|
+| Unit tests | Every iteration — cover all new functions, methods, and logic branches | Pure function input/output, state transitions, edge cases |
+| Integration tests | When iteration touches component boundaries, APIs, or data flow between modules | API endpoint returns correct response, data persists through write/read cycle |
+| End-to-end tests | When iteration completes a user-facing flow | User can perform the full workflow described in User Flows (section 8) |
+| Regression tests | Every iteration — run the full existing suite | All previously passing tests still pass |
+
+**12.3 Verification Commands**
+
+The PRD must specify the exact commands that verify correctness. These commands must work identically whether run by a human developer or an autonomous coding agent:
+
+```markdown
+| Command | Purpose |
+|---------|---------|
+| `[test command]` | Run full test suite |
+| `[format command]` | Run formatter (must produce zero changes) |
+| `[lint command]` | Run linter with zero warnings |
+| `[typecheck command]` | Run type checker (if applicable) |
+| `[build command]` | Verify clean build with no errors |
+```
+
+All five checks (test, format, lint, typecheck, build) must pass for an iteration to be considered complete. If a check type does not apply to the project's stack, note it as N/A with justification.
+
+**Standard formatters by language/stack:** Use the ecosystem-standard formatter for the project's language. Common defaults:
+
+| Language/Stack | Formatter | Check Command |
+|---------------|-----------|---------------|
+| Python | ruff | `ruff format --check .` |
+| Go | gofmt | `gofmt -l . \| grep . && exit 1 \|\| true` |
+| Elixir | mix format | `mix format --check-formatted` |
+| Rust | rustfmt | `cargo fmt -- --check` |
+| JavaScript/TypeScript | prettier | `prettier --check .` |
+| Swift | swift-format | `swift-format lint -r .` |
+| Java/Kotlin | google-java-format / ktfmt | `[project-specific]` |
+
+Choose the formatter that matches the project's stack. If the project already uses a specific formatter (e.g., biome instead of prettier), use that instead. The PRD author should confirm or override during the Testing & Verification Strategy review.
+
+**Format:**
+```markdown
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| TV-1 | Every functional requirement has at least one automated test that maps to its requirement ID | P0 |
+| TV-2 | Full test suite is runnable via a single command with no manual setup | P0 |
+| TV-3 | All tests pass before an iteration is marked complete; any failure blocks completion | P0 |
+| TV-4 | New tests must demonstrably fail before implementation (red/green discipline) | P0 |
+| TV-5 | Tests are deterministic — no flaky tests, no external service dependencies without mocks | P0 |
+| TV-6 | All code is formatted using the project's standard formatter; formatter check produces zero changes | P0 |
+| TV-7 | Test names include the requirement ID they verify (e.g., test_AC_1_...) | P1 |
+| TV-8 | Integration tests cover all component boundaries and API surfaces | P1 |
+| TV-9 | End-to-end tests cover primary user flows once those flows are fully implemented | P1 |
+```
+
+**ID Prefix:** TV = Testing & Verification.
+
+### 13. Success Metrics
 
 A table with columns: Metric, Target.
 
@@ -368,6 +448,34 @@ Are these the right critical areas? Anything to add or remove?
 (Reply "ok" to approve as-is)
 ```
 
+### Testing & Verification Strategy Review
+
+After the critical test areas review, present the testing & verification strategy. For each element:
+
+1. Show the proposed verification commands and test coverage expectations
+2. Ask the user:
+   - Are these the right verification commands for the project's stack?
+   - Are the coverage expectations appropriate (too strict, too lax)?
+   - Are there specific areas where they want more or fewer tests?
+
+```
+### Testing & Verification Strategy
+
+**Verification commands:**
+| Command | Purpose |
+|---------|---------|
+| [test command] | [purpose] |
+| [format command] | [purpose] |
+| [lint command] | [purpose] |
+
+**Coverage expectations:** [summary]
+
+**Red/green discipline:** Every iteration writes failing tests first, then implements until green. Full suite must pass before completion.
+
+Are the verification commands and coverage expectations right for this project?
+(Reply "ok" to approve as-is)
+```
+
 ---
 
 ## Writing Guidelines
@@ -419,5 +527,7 @@ Before saving the PRD:
 - [ ] Success metrics are measurable
 - [ ] Developer experience section covers error handling, debuggability, and agent-friendliness
 - [ ] Critical test areas identified and reviewed with user
+- [ ] Testing & verification strategy defines red/green discipline, coverage expectations, and runnable verification commands
+- [ ] Every functional requirement has a path to automated test coverage
 - [ ] Per-feature acceptance criteria reviewed with user
 - [ ] Saved to `ridl/prd.md`

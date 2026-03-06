@@ -73,7 +73,8 @@ Read the comprehensive PRD and identify:
 - **UI elements** that will need browser verification
 - **Technical architecture** details that inform implementation order
 - **Release milestones** from the PRD milestone/release schedule (Section 9)
-- **Universal context** — non-functional requirements (NF), developer experience (DX), and other cross-cutting concerns that apply across all iteration definitions rather than mapping to individual ones
+- **Testing & verification strategy** — verification commands, red/green discipline, and test coverage expectations (Section 12)
+- **Universal context** — non-functional requirements (NF), developer experience (DX), testing & verification (TV), and other cross-cutting concerns that apply across all iteration definitions rather than mapping to individual ones
 
 ---
 
@@ -96,6 +97,9 @@ PRD sections like Non-Functional Requirements (NF), Developer Experience (DX), a
 - Code style rules (e.g., "SwiftLint passes with zero warnings")
 - Logging conventions (e.g., "use structured key-value format with os.Logger")
 - Architectural patterns (e.g., "Views/, ViewModels/, Models/, Services/ file organization")
+- Verification commands (e.g., "run `npm test` to execute full test suite")
+- Red/green testing discipline (e.g., "new tests must fail before implementation, pass after")
+- Test coverage expectations (e.g., "unit tests for every new function, integration tests at component boundaries")
 
 **Iteration definitions** — concrete, implementable features that happen to live in NF/DX sections:
 - "Settings includes a Debug Mode toggle that enables a debug info pane" → this is a buildable UI feature, make it an iteration definition
@@ -153,7 +157,14 @@ Each criterion must be verifiable — something an agent can CHECK, not somethin
 **Good:** "Add `status` column to tasks table with default 'pending'"
 **Bad:** "Works correctly"
 
-**Always include:** "Typecheck passes" on every iteration definition.
+**Always include on every iteration definition:**
+- "All new functionality has corresponding tests that map to requirement IDs"
+- "New tests fail before implementation (red) and pass after (green)"
+- "Full test suite passes with no regressions"
+- "Formatter check passes with zero changes"
+- "Typecheck passes"
+- All verification commands from the PRD's Testing & Verification Strategy (test, format, lint, typecheck, build) — list the exact commands
+
 **For UI iteration definitions also include:** "Verify in browser using dev-browser skill"
 
 ---
@@ -186,6 +197,17 @@ Cross-cutting requirements that apply to ALL iteration definitions. Every agent 
 ### Developer Experience
 - [DX requirements from source PRD: error handling conventions, logging, code organization, linting, etc.]
 
+### Testing & Verification
+- **Red/green discipline:** Every iteration writes failing tests first, then implements until green. All previous tests must still pass.
+- **Verification commands:**
+  - `[test command]` — Run full test suite
+  - `[format command]` — Run formatter (must produce zero changes)
+  - `[lint command]` — Run linter with zero warnings
+  - `[typecheck command]` — Run type checker
+  - `[build command]` — Verify clean build
+- **Test naming:** Test names include the requirement ID they verify (e.g., `test_AC_1_captures_audio`)
+- **Coverage expectations:** [Unit/integration/e2e expectations from source PRD]
+
 ### Technical Architecture
 - [Key dependencies, shared patterns, component structure from source PRD]
 
@@ -201,6 +223,10 @@ Cross-cutting requirements that apply to ALL iteration definitions. Every agent 
 **Acceptance Criteria:**
 - [ ] Specific verifiable criterion
 - [ ] Another criterion
+- [ ] Tests written for TE-1 and TE-2 (failing before implementation, passing after)
+- [ ] Full test suite passes with no regressions
+- [ ] `[format command]` produces zero changes
+- [ ] `[lint command]` passes with zero warnings
 - [ ] Typecheck passes
 
 ### ID-002: [Title]
@@ -319,7 +345,10 @@ Before saving ridl.md:
 - [ ] Non-functional, DX, and cross-cutting requirements extracted into Universal Context
 - [ ] Functional requirements broken into agent-sized iteration definitions
 - [ ] Iteration definitions ordered by dependency (schema → backend → UI)
+- [ ] Testing & verification strategy extracted into Universal Context (commands, red/green discipline, coverage expectations)
+- [ ] Every iteration definition has test-writing criteria (tests for new functionality, red/green, full suite passes)
 - [ ] Every iteration definition has "Typecheck passes" as criterion
+- [ ] Every iteration definition lists the PRD's verification commands (test, format, lint, typecheck, build)
 - [ ] UI iteration definitions have "Verify in browser using dev-browser skill" as criterion
 - [ ] Acceptance criteria are verifiable (not vague)
 - [ ] No iteration definition depends on a later one
