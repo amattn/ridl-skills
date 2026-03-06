@@ -194,7 +194,17 @@ Define how the product supports runtime inspection and troubleshooting:
 - Structured logging with severity levels and consistent key-value formatting that is parseable by both humans and tools
 - Sufficient log context to diagnose issues from logs alone without requiring a debugger session
 
-**6.3 Code Readability & Agent-Friendliness**
+**6.3 Build Identification & Version Tracking**
+
+Every build artifact must be identifiable by version. Users, developers, and agents must be able to determine the exact version of the running software. Requirements should address:
+
+- **CLI tools:** Support `-v` and `--version` flags that print the current semantic version
+- **GUI / desktop apps:** Display the app name and current version in an accessible location (e.g., About pane, Settings window, title bar). Propose a reasonable default placement and add an open question for the PRD author to confirm or override.
+- **Web apps:** Display the current version in an accessible location (e.g., settings page, config panel, footer). Propose a reasonable default placement and add an open question for the PRD author to confirm or override.
+- **Log output:** Print the application version on startup in the first log line(s)
+- **Semantic versioning during development:** Milestones define the minor (or major) version. Each completed RIDL iteration within a milestone increments the patch version. For example, milestone MS-1 (v0.1) produces builds v0.1.0, v0.1.1, v0.1.2, etc. as iterations complete. When MS-2 (v0.2) begins, the version resets to v0.2.0.
+
+**6.4 Code Readability & Agent-Friendliness**
 
 Define standards that make the codebase easy to navigate for humans and effective for coding agents:
 
@@ -214,6 +224,9 @@ Define standards that make the codebase easy to navigate for humans and effectiv
 | DX-4 | Public module APIs have doc comments covering purpose, parameters, and return values | P1 |
 | DX-5 | Error strings are unique and greppable to locate the exact throw site in source | P1 |
 | DX-6 | All code must pass the project linter and formatter with zero warnings; enforced via CI pre-merge check | P0 |
+| DX-7 | Application version is displayed via --version flag (CLI), About pane or settings window (GUI), or settings/config page (web) | P0 |
+| DX-8 | Application version is printed to log output on startup | P1 |
+| DX-9 | Version follows semver; milestone defines minor version, each iteration increments patch (e.g., MS-1 v0.1 → v0.1.0, v0.1.1, v0.1.2) | P0 |
 ```
 
 **ID Prefix:** DX = Developer Experience.
