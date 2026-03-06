@@ -1,6 +1,6 @@
 ---
 name: ridljson
-version: 2.1.0
+version: 2.1.1
 description: "Convert ridl.md to ridl.json format for the RIDL autonomous agent system. This skill should be used when the user asks to 'convert ridl.md', 'turn this into ridl json', 'create ridl.json', 'ridl json', 'convert ridl.md to json', or 'make ridl iterations from ridl.md'."
 user-invocable: true
 ---
@@ -93,6 +93,24 @@ Always update the `version` field in the YAML frontmatter at the top of this fil
 
 ---
 
+## Frozen Iteration Definitions
+
+When converting or updating `ridl.json`, check if a `ridl/ridl.json` already exists. If it does, read it and identify any iteration definitions where `"passes": true`.
+
+**Frozen iteration definitions must not be modified.** A passing iteration definition represents completed, verified work. Its `userStoryTitle`, `userStoryDescription`, `prdReferences`, `acceptanceCriteria`, `milestone`, and `priority` are all locked.
+
+When updating `ridl.json`:
+
+1. **Preserve frozen definitions exactly as-is** — copy them verbatim into the new output, including `"passes": true` and any `"notes"` content
+2. **Never merge new requirements into frozen definitions** — if a requirement change or new feature would have affected a frozen definition, it must become a new iteration definition that builds on top of the frozen one
+3. **ID numbering continues** — new iteration definitions use the next available ID number after all existing definitions
+4. **Frozen definitions keep their position** — they remain at their original priority/order; new definitions are appended after all existing ones
+5. **Non-frozen definitions may be updated** — iteration definitions with `"passes": false` can still be modified, reordered, split, or merged as needed during regeneration
+
+If no existing `ridl.json` is found, generate all iteration definitions fresh with `"passes": false`.
+
+---
+
 ## Iteration Definition Size: The Number One Rule
 
 **Each iteration definition must be completable in ONE RIDL iteration (one context window).**
@@ -171,7 +189,7 @@ Frontend iteration definitions are NOT complete until visually verified. The age
 1. **Each iteration definition becomes one JSON entry** in the `"iterationDefinitions"` array
 2. **IDs**: Sequential (ID-001, ID-002, etc.)
 3. **Priority**: Based on dependency order, then document order
-4. **All iteration definitions**: `passes: false` and empty `notes`
+4. **New iteration definitions**: `passes: false` and empty `notes`; **frozen definitions** (with `passes: true` in existing ridl.json) are preserved exactly as-is
 5. **branchName**: Derive from feature name, kebab-case, prefixed with `ridl/`
 6. **Always add**: "Typecheck passes" to every iteration definition's acceptance criteria
 7. **Universal context**: Convert the `## Universal Context` section from ridl.md into the top-level `"universalContext"` object with `nonFunctionalRequirements`, `developerExperience`, and `technicalArchitecture` arrays
@@ -433,6 +451,8 @@ This skill is step 3 in the RIDL pipeline. All files live in the `ridl/` directo
 Before writing ridl.json, verify:
 
 - [ ] **Previous run archived** (if ridl.json exists with different branchName, archive it first)
+- [ ] **Frozen definitions preserved** — all iteration definitions with `passes: true` in existing ridl.json copied verbatim
+- [ ] **No frozen definitions modified** — new requirements added as new iteration definitions, not merged into frozen ones
 - [ ] Universal context extracted into `"universalContext"` object
 - [ ] Each iteration definition is completable in one iteration (small enough)
 - [ ] Iteration definitions are ordered by dependency (schema to backend to UI)

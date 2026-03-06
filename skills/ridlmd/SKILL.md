@@ -1,6 +1,6 @@
 ---
 name: ridlmd
-version: 2.1.0
+version: 2.1.1
 description: "Convert a comprehensive PRD into an agent-sized ridl.md with iteration definitions for the RIDL autonomous agent loop. Each iteration definition encompasses a user story and verifiable acceptance criteria. This skill should be used when the user asks to 'convert prd to ridl', 'create ridl.md', 'make ridl iterations from prd', 'ridl md', 'break prd into iterations', 'convert prd to iteration definitions', 'break prd into stories', or 'convert prd to user stories'. Reads a comprehensive PRD and distills it into small, agent-sized iteration definitions."
 user-invocable: true
 ---
@@ -42,6 +42,24 @@ Always update the `version` field in the YAML frontmatter at the top of this fil
 - First local edit: `1.0.0-ridlmd.1`
 - Second local edit: `1.0.0-ridlmd.2`
 - Source PRD regenerated: version resets to the new PRD version (e.g., `1.1.0`) with no suffix
+
+---
+
+## Frozen Iteration Definitions
+
+Before generating or updating `ridl.md`, check if a `ridl/ridl.json` already exists. If it does, read it and identify any iteration definitions where `"passes": true`.
+
+**Frozen iteration definitions must not be modified.** A passing iteration definition represents completed, verified work. Its title, user story, PRD references, and acceptance criteria are locked.
+
+When updating `ridl.md`:
+
+1. **Preserve frozen definitions exactly as-is** — do not change their text, reorder their criteria, or merge new requirements into them
+2. **Append new work as new iteration definitions** — if a requirement change or new feature would have affected a frozen definition, create a new iteration definition instead (e.g., ID-005, ID-006) that builds on top of the frozen one
+3. **ID numbering continues** — new iteration definitions use the next available ID number after all existing definitions (frozen or not)
+4. **Frozen definitions keep their position** — do not reorder them; new definitions are appended after all existing ones
+5. **Milestone assignment** — new iteration definitions may be assigned to existing or new milestones, but frozen definitions must stay in their original milestone
+
+If no `ridl/ridl.json` exists, skip this check and generate all iteration definitions fresh.
 
 ---
 
@@ -294,6 +312,9 @@ This skill is step 2 in the RIDL pipeline. All files live in the `ridl/` directo
 
 Before saving ridl.md:
 
+- [ ] Checked for existing `ridl/ridl.json` and identified frozen (`passes: true`) iteration definitions
+- [ ] Frozen iteration definitions preserved exactly as-is (not modified, reordered, or merged)
+- [ ] New requirements appended as new iteration definitions (not merged into frozen ones)
 - [ ] Source PRD was read and analyzed
 - [ ] Non-functional, DX, and cross-cutting requirements extracted into Universal Context
 - [ ] Functional requirements broken into agent-sized iteration definitions
