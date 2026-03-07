@@ -487,10 +487,10 @@ This skill is step 3 in the RIDL pipeline. All files live in the `ridl/` directo
 
 1. Read the current `ridl/ridl.json` if it exists
 2. Check if `branchName` differs from the new feature's branch name
-3. If different AND `progress.txt` has content beyond the header:
+3. If different AND `progress.md` has content beyond the header:
    - Create archive folder: `ridl/archive/YYYY-MM-DD-feature-name/`
-   - Copy current `ridl.json` and `progress.txt` to archive
-   - Reset `progress.txt` with fresh header
+   - Copy current `ridl.json` and `progress.md` to archive
+   - Reset `progress.md` with fresh header
 
 ---
 

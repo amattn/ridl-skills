@@ -1,7 +1,7 @@
 {
   "name": "ridl-skills",
   "version": "2.2.0",
-  "description": "PRD generation and conversion skills for the RIDL autonomous agent system",
+  "description": "PRD generation skills for the Ralph Loop inspired RIDL autonomous agent system",
   "author": {
     "name": "amattn"
   },
