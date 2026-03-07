@@ -38,14 +38,43 @@ skills/
 /ridl-skills:ridlprompts →  ridl/prompts/*.liquid
 ```
 
+## Runtime Artifacts
+
+During RIDL execution, the following files are created in `ridl/` alongside the pipeline outputs:
+- `progress.md` — Append-only log of what was implemented and verified each iteration
+- `learnings.md` — Agent-facing: codebase patterns, tool quirks, implementation techniques, debugging tips. Helps future agents do the work better.
+- `emergent.md` — Human-facing: design decisions made without human input, requirement gaps, assumptions needing validation, scope questions, edge cases the PRD didn't anticipate. Items here should be backported to the PRD on regeneration.
+
+All three can be read from and appended to by any agent in any phase (implementation or verification).
+
 ## Key Conventions
 
-- **Versioning:** All four skill files and both plugin/marketplace JSON files must stay in sync on version number. Bump all six when releasing.
+- **Versioning:** All four skill files and both plugin/marketplace JSON files must stay in sync on version number. Bump all six when releasing. Update `CHANGELOG.md` with the new version entry.
 - **Semver rules for skill files:** Patch for small fixes, minor for workflow/template changes, major for breaking output format changes.
-- **Frozen iteration definitions:** When `"passes": true` in ridl.json, that iteration definition is frozen and must not be modified. New work is appended as new iteration definitions.
+- **Frozen iteration definitions:** When all acceptance criteria in an iteration definition have `"status": "pass"` in ridl.json, that iteration definition is frozen and must not be modified. New work is appended as new iteration definitions.
 - **Requirement IDs:** Format is `XX-N` (short prefix, hyphen, integer). No letter suffixes.
 - **Liquid code blocks:** Use `~~~liquid` fences (not triple backticks) for Liquid template blocks to avoid conflicts with nested markdown code blocks.
 - **Commit messages:** Format is `prefix: summary` or `prefix: [vX.Y.Z] summary` when there is a version bump. Follow with a blank line and detailed bullet points describing what changed and why. Common prefixes: `feature`, `fix`, `refactor`, `docs`, `chore`.
+
+## Clarifying Questions Style
+
+When any skill needs to ask the user clarifying questions, use lettered options so users can respond quickly (e.g., "1A, 2C, 3B"). Always ask if the user wants to go through them one by one instead.
+
+```
+1. What is the primary platform?
+   A. macOS native (Swift/SwiftUI)
+   B. iOS (Swift/SwiftUI)
+   C. Web (React/Next.js)
+   D. Other: [please specify]
+
+2. Who is the primary target user?
+   A. End consumers
+   B. Internal team / enterprise
+   C. Developers / technical users
+   D. All of the above
+```
+
+Remember to indent the options.
 
 ## Development Rules
 

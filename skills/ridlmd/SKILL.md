@@ -1,6 +1,6 @@
 ---
 name: ridlmd
-version: 2.2.0
+version: 3.0.0
 description: "Convert a comprehensive PRD into an agent-sized ridl.md with iteration definitions for the RIDL autonomous agent loop. Each iteration definition encompasses a user story and verifiable acceptance criteria. This skill should be used when the user asks to 'convert prd to ridl', 'create ridl.md', 'make ridl iterations from prd', 'ridl md', 'break prd into iterations', 'convert prd to iteration definitions', 'break prd into stories', or 'convert prd to user stories'. Reads a comprehensive PRD and distills it into small, agent-sized iteration definitions."
 user-invocable: true
 ---
@@ -47,9 +47,9 @@ Always update the `version` field in the YAML frontmatter at the top of this fil
 
 ## Frozen Iteration Definitions
 
-Before generating or updating `ridl.md`, check if a `ridl/ridl.json` already exists. If it does, read it and identify any iteration definitions where `"passes": true`.
+Before generating or updating `ridl.md`, check if a `ridl/ridl.json` already exists. If it does, read it and identify any iteration definitions where **all** acceptance criteria have `"status": "pass"`.
 
-**Frozen iteration definitions must not be modified.** A passing iteration definition represents completed, verified work. Its title, user story, PRD references, and acceptance criteria are locked.
+**Frozen iteration definitions must not be modified.** A fully-passing iteration definition (all criteria at `"status": "pass"`) represents completed, verified work. Its title, user story, PRD references, and acceptance criteria are locked.
 
 When updating `ridl.md`:
 
@@ -97,7 +97,7 @@ PRD sections like Non-Functional Requirements (NF), Developer Experience (DX), a
 - Code style rules (e.g., "SwiftLint passes with zero warnings")
 - Logging conventions (e.g., "use structured key-value format with os.Logger")
 - Architectural patterns (e.g., "Views/, ViewModels/, Models/, Services/ file organization")
-- Verification commands (e.g., "run `npm test` to execute full test suite")
+- Verification commands (e.g., "run `pytest` to execute full test suite")
 - Red/green testing discipline (e.g., "new tests must fail before implementation, pass after")
 - Test coverage expectations (e.g., "unit tests for every new function, integration tests at component boundaries")
 
@@ -161,9 +161,12 @@ Each criterion must be verifiable — something an agent can CHECK, not somethin
 - "All new functionality has corresponding tests that map to requirement IDs"
 - "New tests fail before implementation (red) and pass after (green)"
 - "Full test suite passes with no regressions"
-- "Formatter check passes with zero changes"
-- "Typecheck passes"
-- All verification commands from the PRD's Testing & Verification Strategy (test, format, lint, typecheck, build) — list the exact commands
+- "`[format check command]` produces zero changes"
+- "`[lint command]` passes with zero warnings"
+- "`[typecheck command]` passes"
+- "`[build command]` succeeds with no errors or warnings"
+
+Where `[xxx command]` means the exact command from the PRD's Testing & Verification Strategy (Section 12.3).
 
 **For UI iteration definitions also include:** "Verify in browser using dev-browser skill"
 
@@ -201,10 +204,11 @@ Cross-cutting requirements that apply to ALL iteration definitions. Every agent 
 - **Red/green discipline:** Every iteration writes failing tests first, then implements until green. All previous tests must still pass.
 - **Verification commands:**
   - `[test command]` — Run full test suite
-  - `[format command]` — Run formatter (must produce zero changes)
+  - `[format check command]` — Run formatter in check mode (must produce zero changes)
+  - `[format fix command]` — Run formatter to auto-fix; use this first when the check fails
   - `[lint command]` — Run linter with zero warnings
   - `[typecheck command]` — Run type checker
-  - `[build command]` — Verify clean build
+  - `[build command]` — Verify clean build with no errors or warnings
 - **Test naming:** Test names include the requirement ID they verify (e.g., `test_AC_1_captures_audio`)
 - **Coverage expectations:** [Unit/integration/e2e expectations from source PRD]
 
@@ -225,9 +229,10 @@ Cross-cutting requirements that apply to ALL iteration definitions. Every agent 
 - [ ] Another criterion
 - [ ] Tests written for TE-1 and TE-2 (failing before implementation, passing after)
 - [ ] Full test suite passes with no regressions
-- [ ] `[format command]` produces zero changes
+- [ ] `[format check command]` produces zero changes
 - [ ] `[lint command]` passes with zero warnings
-- [ ] Typecheck passes
+- [ ] `[typecheck command]` passes
+- [ ] `[build command]` succeeds with no errors or warnings
 
 ### ID-002: [Title]
 **User Story:** As a [user], I want [feature] so that [benefit].
@@ -291,7 +296,8 @@ After generating the draft, present each iteration definition to the user for re
 **Acceptance Criteria:**
 - [ ] Criterion 1
 - [ ] Criterion 2
-- [ ] Typecheck passes
+- [ ] `[typecheck command]` passes
+- [ ] `[build command]` succeeds with no errors or warnings
 
 Anything to add, change, or remove for this iteration definition?
 (Reply "ok" to approve as-is and move to the next one)
@@ -327,10 +333,10 @@ The ridl.md reader is an AI agent. Therefore:
 This skill is step 2 in the RIDL pipeline. All files live in the `ridl/` directory:
 
 ```
-/ridl-skills:prd        →  ridl/prd.md              (comprehensive PRD)
-/ridl-skills:ridlmd     →  ridl/ridl.md             (agent-sized iteration definitions)  ← you are here
-/ridl-skills:ridljson   →  ridl/ridl.json           (JSON for autonomous loop)
-/ridl-skills:ridlprompts →  ridl/prompts/*.liquid    (harness prompt templates)
+/ridl-skills:prd         →  ridl/prd.md             (comprehensive PRD)
+/ridl-skills:ridlmd      →  ridl/ridl.md            (agent-sized iteration definitions)  ← you are here
+/ridl-skills:ridljson    →  ridl/ridl.json          (JSON for autonomous loop)
+/ridl-skills:ridlprompts →  ridl/prompts/*.liquid   (harness prompt templates)
 ```
 
 ---
@@ -339,7 +345,7 @@ This skill is step 2 in the RIDL pipeline. All files live in the `ridl/` directo
 
 Before saving ridl.md:
 
-- [ ] Checked for existing `ridl/ridl.json` and identified frozen (`passes: true`) iteration definitions
+- [ ] Checked for existing `ridl/ridl.json` and identified frozen (all criteria `"status": "pass"`) iteration definitions
 - [ ] Frozen iteration definitions preserved exactly as-is (not modified, reordered, or merged)
 - [ ] New requirements appended as new iteration definitions (not merged into frozen ones)
 - [ ] Source PRD was read and analyzed
@@ -348,8 +354,7 @@ Before saving ridl.md:
 - [ ] Iteration definitions ordered by dependency (schema → backend → UI)
 - [ ] Testing & verification strategy extracted into Universal Context (commands, red/green discipline, coverage expectations)
 - [ ] Every iteration definition has test-writing criteria (tests for new functionality, red/green, full suite passes)
-- [ ] Every iteration definition has "Typecheck passes" as criterion
-- [ ] Every iteration definition lists the PRD's verification commands (test, format, lint, typecheck, build)
+- [ ] Every iteration definition lists all 5 verification commands from the PRD (test, format, lint, typecheck, build)
 - [ ] UI iteration definitions have "Verify in browser using dev-browser skill" as criterion
 - [ ] Acceptance criteria are verifiable (not vague)
 - [ ] No iteration definition depends on a later one

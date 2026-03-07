@@ -1,6 +1,6 @@
 ---
 name: prd
-version: 2.2.0
+version: 3.0.0
 description: "Generate a comprehensive Product Requirements Document (PRD). This skill should be used when the user asks to 'create a prd', 'write a prd', 'plan this feature', 'write requirements for', 'spec out', 'create a product spec', or 'write a requirements doc'. Produces detailed, human-readable PRDs with requirement tables, technical architecture, user flows, and release milestones."
 user-invocable: true
 ---
@@ -18,6 +18,8 @@ Generate detailed Product Requirements Documents that are thorough, well-structu
 3. Generate a draft PRD based on answers
 4. **Per-feature acceptance criteria review:** Present each feature area's requirements to the user and ask if they want to adjust, add, or remove specific acceptance criteria before finalizing
 5. Incorporate feedback and save to `ridl/prd.md`
+
+**Updating an existing PRD:** If `ridl/emergent.md` exists with items, triage them with the user and incorporate the results into the existing PRD (see Emergent Items Triage). This typically happens after RIDL loops have progressed and surfaced items that need to flow back into the PRD.
 
 **Important:** Do NOT start implementing. Just create the PRD.
 
@@ -67,7 +69,7 @@ Ask only critical questions where the initial prompt is ambiguous. Focus on:
    D. Just the UI
 ```
 
-This lets users respond with "1A, 2C, 3B" for quick iteration. Remember to indent the options.
+This lets users respond with "1A, 2C, 3B" for quick iteration. Always ask if the user wants to go through them one by one instead. Remember to indent the options.
 
 ---
 
@@ -351,25 +353,30 @@ The PRD must specify the exact commands that verify correctness. These commands 
 | Command | Purpose |
 |---------|---------|
 | `[test command]` | Run full test suite |
-| `[format command]` | Run formatter (must produce zero changes) |
+| `[format check command]` | Run formatter in check mode (must produce zero changes) |
+| `[format fix command]` | Run formatter to auto-fix formatting |
 | `[lint command]` | Run linter with zero warnings |
 | `[typecheck command]` | Run type checker (if applicable) |
-| `[build command]` | Verify clean build with no errors |
+| `[build command]` | Verify clean build with no errors or warnings |
 ```
+
+**Format check vs. format fix.** Most formatters have two modes: a **check** mode that reports violations without changing files, and a **fix** mode that rewrites files in place. The PRD should specify both commands. When the format check fails, agents should run the fix command first — most formatting issues are mechanical and the formatter will resolve them automatically. Only investigate manually if the fix command itself fails or produces unexpected results.
 
 All five checks (test, format, lint, typecheck, build) must pass for an iteration to be considered complete. If a check type does not apply to the project's stack, note it as N/A with justification.
 
+**Build command: treat warnings as errors.** If the project's build tooling supports a "warnings as errors" flag, the build command should enable it (e.g., `-Werror` for C/C++/Swift, `-warnaserror` for .NET, `RUSTFLAGS="-D warnings"` for Rust). This prevents warning accumulation and ensures agents fix warnings immediately rather than letting them pile up across iterations.
+
 **Standard formatters by language/stack:** Use the ecosystem-standard formatter for the project's language. Common defaults:
 
-| Language/Stack | Formatter | Check Command |
-|---------------|-----------|---------------|
-| Python | ruff | `ruff format --check .` |
-| Go | gofmt | `gofmt -l . \| grep . && exit 1 \|\| true` |
-| Elixir | mix format | `mix format --check-formatted` |
-| Rust | rustfmt | `cargo fmt -- --check` |
-| JavaScript/TypeScript | prettier | `prettier --check .` |
-| Swift | swift-format | `swift-format lint -r .` |
-| Java/Kotlin | google-java-format / ktfmt | `[project-specific]` |
+| Language/Stack | Formatter | Check Command | Fix Command |
+|---------------|-----------|---------------|-------------|
+| Python | ruff | `ruff format --check .` | `ruff format .` |
+| Go | gofmt | `gofmt -l . \| grep . && exit 1 \|\| true` | `gofmt -w .` |
+| Elixir | mix format | `mix format --check-formatted` | `mix format` |
+| Rust | rustfmt | `cargo fmt -- --check` | `cargo fmt` |
+| JavaScript/TypeScript | prettier | `prettier --check .` | `prettier --write .` |
+| Swift | swift-format | `swift-format lint -r .` | `swift-format -r .` |
+| Java/Kotlin | google-java-format / ktfmt | `[project-specific]` | `[project-specific]` |
 
 Choose the formatter that matches the project's stack. If the project already uses a specific formatter (e.g., biome instead of prettier), use that instead. The PRD author should confirm or override during the Testing & Verification Strategy review.
 
@@ -465,8 +472,11 @@ After the critical test areas review, present the testing & verification strateg
 | Command | Purpose |
 |---------|---------|
 | [test command] | [purpose] |
-| [format command] | [purpose] |
+| [format check command] | [purpose] |
+| [format fix command] | [purpose] |
 | [lint command] | [purpose] |
+| [typecheck command] | [purpose] |
+| [build command] | [purpose] |
 
 **Coverage expectations:** [summary]
 
@@ -475,6 +485,53 @@ After the critical test areas review, present the testing & verification strateg
 Are the verification commands and coverage expectations right for this project?
 (Reply "ok" to approve as-is)
 ```
+
+### Emergent Items Triage
+
+When `ridl/emergent.md` exists, it contains items that surfaced during RIDL execution and need to be incorporated back into the PRD. These are human-facing items — design decisions made without human input, requirement gaps, assumptions, scope questions, and edge cases.
+
+**When updating an existing PRD**, read `ridl/emergent.md` and work through each item with the user:
+
+1. Read `ridl/emergent.md` and group items by category (design decision, requirement gap, assumption, scope question, edge case)
+2. Present each item to the user one at a time, showing:
+   - The emergent item ID (EM-N)
+   - The iteration definition and phase it came from
+   - The category and description
+   - What was decided or assumed by the agent
+3. For each item, ask the user:
+   - **Approve** — incorporate this into the PRD as-is
+   - **Modify** — incorporate with changes (ask what to change)
+   - **Reject** — do not incorporate; the agent's assumption was wrong
+   - **Defer** — leave it in emergent.md for now; don't incorporate yet
+4. Track which items were resolved and how
+
+### Format the triage like this:
+
+```
+### EM-N: [Short title]
+**Category:** [design decision | requirement gap | assumption | scope question | edge case]
+**Source:** [ID-xxx] [iteration title]
+**Phase:** [implementation | verification]
+
+> [What came up and what was decided/assumed]
+
+How should this be handled in the PRD?
+  A. Approve as-is — add to PRD
+  B. Modify — add with changes
+  C. Reject — agent's assumption was wrong
+  D. Defer — leave for later
+
+(Reply with a letter, or explain what you'd like to change)
+```
+
+After triage:
+- **Approved items** become new or updated requirements in the PRD draft, with EM-N reference noting the source emergent item
+- **Modified items** become new or updated requirements in the PRD draft, with EM-N reference noting the source emergent item. Optionally also note in Resolved Questions (Section 10) what was changed and why.
+- **Rejected items** are noted in Resolved Questions (Section 10) with EM-N reference and the correct decision
+- **Deferred items** are added to Open Questions (Section 10) with their EM-N ID and stay in `ridl/emergent.md` for the next triage
+- **After saving `ridl/prd.md`**, update triaged items in `ridl/emergent.md` by changing the existing `- **Outcome:** pending` line to `- **Outcome:** [approved | approved with changes | rejected | deferred]` with a brief summary of the decision. Do not modify `ridl/emergent.md` until the PRD is saved.
+
+If `ridl/emergent.md` does not exist or is empty, skip this step.
 
 ---
 
@@ -505,10 +562,10 @@ Create the `ridl/` directory if it does not exist.
 This skill is step 1 in the RIDL pipeline. All files live in `ridl/`:
 
 ```
-/ridl-skills:prd        →  ridl/prd.md              (comprehensive PRD)  ← you are here
-/ridl-skills:ridlmd     →  ridl/ridl.md             (agent-sized iteration definitions)
-/ridl-skills:ridljson   →  ridl/ridl.json           (JSON for autonomous loop)
-/ridl-skills:ridlprompts →  ridl/prompts/*.liquid    (harness prompt templates)
+/ridl-skills:prd         →  ridl/prd.md             (comprehensive PRD)  ← you are here
+/ridl-skills:ridlmd      →  ridl/ridl.md            (agent-sized iteration definitions)
+/ridl-skills:ridljson    →  ridl/ridl.json          (JSON for autonomous loop)
+/ridl-skills:ridlprompts →  ridl/prompts/*.liquid   (harness prompt templates)
 ```
 
 ---
@@ -517,6 +574,8 @@ This skill is step 1 in the RIDL pipeline. All files live in `ridl/`:
 
 Before saving the PRD:
 
+- [ ] If updating existing PRD: checked for `ridl/emergent.md` and triaged items with user
+- [ ] If updating existing PRD: approved/modified items incorporated into PRD with EM-N reference; rejected items in Resolved Questions with EM-N reference; deferred items in Open Questions with EM-N reference and left in `ridl/emergent.md`
 - [ ] Asked clarifying questions with lettered options
 - [ ] Incorporated user's answers
 - [ ] All requirements have IDs and priorities
@@ -532,3 +591,7 @@ Before saving the PRD:
 - [ ] Every functional requirement has a path to automated test coverage
 - [ ] Per-feature acceptance criteria reviewed with user
 - [ ] Saved to `ridl/prd.md`
+
+After saving:
+
+- [ ] If updating existing PRD: Outcome field updated in `ridl/emergent.md` for all triaged items (approved, approved with changes, rejected, or deferred)
