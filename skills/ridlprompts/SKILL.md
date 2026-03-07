@@ -1,6 +1,6 @@
 ---
 name: ridlprompts
-version: 3.0.0
+version: 3.0.1
 description: "Generate Liquid prompt template files for a RIDL harness (such as Ridler.app). This skill should be used when the user asks to 'generate ridl prompts', 'create ridl prompts', 'ridl prompts', 'generate loop prompts', 'create prompt templates', 'set up ridl harness', or 'initialize ridl prompts'. Produces the default set of Liquid templates that drive the RIDL autonomous coding agent loop."
 user-invocable: true
 ---
@@ -68,7 +68,7 @@ Agents communicate completion state to the harness via XML tags at the end of th
 | `<ridler-implementation-complete/>` | Implementation finished, all criteria set to `"pass"` | Move to verification phase (fresh context window) |
 | `<ridler-verification-complete/>` | Verification confirmed all criteria are `"pass"` | Move to next iteration definition |
 | `<ridler-verification-failed/>` | Verification found issues the agent could not fix | Loop back to a fresh implementation invocation targeting failing criteria |
-| `<ridler-blocked/>` | Cannot proceed — needs human input (unclear requirements, missing dependency, infrastructure issue) | Pause execution and surface the blocker to the human |
+| `<ridler-blocked/>` | **Last resort.** Cannot proceed — truly stuck (infrastructure failure, missing access, impossible contradiction in requirements). Agent MUST write detailed logs, update `progress.md` with BLOCKED status, document in `emergent.md`, and update `learnings.md` before signaling. Most unclear requirements should be resolved by making a reasonable decision and logging it in `emergent.md`, not by blocking | Pause execution and surface the blocker to the human |
 
 Every agent invocation must end with exactly one of these signals. If no signal is emitted, the harness should treat it as an unexpected crash and surface it to the human.
 
@@ -165,7 +165,12 @@ Update criterion statuses as you work so the harness can observe progress.
 
 When implementation is done, signal with exactly one of:
 - `<ridler-implementation-complete/>` — implementation finished, ready for verification
-- `<ridler-blocked/>` — cannot proceed, needs human input (document the blocker in `ridl/emergent.md`)
+- `<ridler-blocked/>` — **last resort** — cannot proceed, needs human input. The primary goal of RIDL loops is autonomous execution without human intervention. In most cases of unclear requirements, make a reasonable decision, document it in `ridl/emergent.md`, and keep going. Only block when you are truly stuck (infrastructure failure, missing access, impossible contradiction in requirements). **Before signaling**, you MUST:
+  1. Write a detailed explanation to the log output describing: what you were trying to do, what went wrong, what you tried, and why you cannot proceed
+  2. Append a full entry to `ridl/progress.md` documenting the blocker (use the standard format with `- **Phase:** implementation` and `- **Status:** BLOCKED`)
+  3. Append to `ridl/emergent.md` with category `blocker` describing what the human needs to resolve
+  4. Set relevant criteria to `"status": "error"` in `ridl/ridl.json`
+  The human will read these to understand the situation — if the logs and files are vague, the human cannot help.
 ~~~
 
 ### 2. `verification.liquid`
@@ -216,11 +221,18 @@ If you find issues you **cannot** fix in this context:
 
 ### If Blocked
 
-If you **cannot proceed** for reasons outside your control (missing dependency, unclear requirements, needs human input, infrastructure issue):
+**Blocking is a last resort.** The primary goal of RIDL loops is autonomous execution without human intervention. In most cases of unclear requirements, make a reasonable decision, document it in `ridl/emergent.md`, and keep going. Only block when you are truly stuck — infrastructure failure, missing access, impossible contradiction in requirements.
 
-1. Set the relevant criteria to `"status": "error"` in ridl/ridl.json
-2. Document the blocker in `ridl/emergent.md`
-3. Signal: `<ridler-blocked/>` — the harness will pause and surface this to the human
+If you **cannot proceed** despite the above:
+
+1. **Write a detailed explanation to the log output** describing: what you were trying to do, what went wrong, what you tried to resolve it, and why you cannot proceed. Be specific — the human will read this to understand the situation.
+2. Set the relevant criteria to `"status": "error"` in `ridl/ridl.json`
+3. Append a full entry to `ridl/progress.md` documenting the blocker (use the standard format with `- **Phase:** verification` and `- **Status:** BLOCKED`, include what was attempted and what failed)
+4. Document the blocker in `ridl/emergent.md` with category `blocker` describing what the human needs to resolve
+5. Append to `ridl/learnings.md` any context that would help the next agent attempt (what was tried, what error messages appeared, what paths were explored)
+6. Signal: `<ridler-blocked/>` — the harness will pause and surface this to the human
+
+**The quality of your blocked documentation determines whether the human can help.** Vague blockers like "couldn't get it to work" are useless. Be thorough.
 
 ## Before Signaling Completion
 

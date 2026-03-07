@@ -2,6 +2,23 @@
 
 All notable changes to ridl-skills are documented in this file.
 
+## [3.0.1] — 2026-03-07
+
+### Added
+
+- **Debug numbers** — DX section now includes debug number technique: every error string and structured log call includes a unique, random 12-digit positive integer hard-coded at the throw/log site, making errors and log lines instantly greppable to their exact source location. Added DX-5 and DX-6 example requirements.
+- **Future Considerations section** — New PRD section 13 for capturing out-of-scope ideas noted for potential future development without committing to them. Prevents scope creep while ensuring good ideas aren't lost. Success Metrics renumbered to section 14.
+- **Final Review step** — Three closing checks before saving: full consistency pass, recommendations based on the PRD as a whole, and an open questions sweep to catch anything missed.
+- **ridljson: Preserve literal characters** — Explicit rule and warning in Conversion Rules that backticks, quotes, and other inline characters in ridl.md criterion text must be copied verbatim into JSON strings. Added to checklist. Fixed example JSON to preserve backticks around commands.
+- **Project scaffolding first** — PRD milestones section and ridlmd ordering section now emphasize that the first milestone/iteration definition should almost always be project scaffolding (project structure, build system, dependencies, `.gitignore`, linter/formatter config, minimal hello world).
+- **Blocked signal as last resort** — Both `agent_instructions.liquid` and `verification.liquid` now emphasize that blocking is a last resort. Agents should make reasonable decisions and log them in `emergent.md` rather than blocking on unclear requirements. Blocking is reserved for truly stuck situations (infrastructure failure, missing access, impossible contradictions). When blocking, agents must write detailed log output, update `progress.md` with BLOCKED status, document in `emergent.md`, and update `learnings.md`.
+
+### Changed
+
+- DX example requirements renumbered (DX-5 through DX-10) to accommodate new debug number entries.
+- PRD checklist updated to include Future Considerations and Final Review verification.
+- ridljson example JSON updated: criterion strings now preserve backticks around commands matching the ridl.md source.
+
 ## [3.0.0] — 2026-03-06
 
 Two-phase iteration workflow and per-criterion status tracking. This is a major structural change to how RIDL iterations execute and how acceptance criteria are tracked in ridl.json.

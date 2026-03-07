@@ -1,6 +1,6 @@
 ---
 name: ridljson
-version: 3.0.0
+version: 3.0.1
 description: "Convert ridl.md to ridl.json format for the RIDL autonomous agent system. This skill should be used when the user asks to 'convert ridl.md', 'turn this into ridl json', 'create ridl.json', 'ridl json', 'convert ridl.md to json', or 'make ridl iterations from ridl.md'."
 user-invocable: true
 ---
@@ -218,6 +218,18 @@ Frontend iteration definitions are NOT complete until visually verified. The age
 
 ## Conversion Rules
 
+**CRITICAL — Preserve literal characters in criterion strings.** When converting acceptance criteria text from ridl.md into JSON `"criterion"` string values, copy the text **exactly** as written. Preserve all backticks, double quotes, single quotes, and other inline characters. These are content, not formatting. For example:
+
+- ridl.md: `` `ruff format --check .` produces zero changes ``
+- Correct JSON: `"criterion": "\u0060ruff format --check .\u0060 produces zero changes"`
+- **Wrong** JSON: `"criterion": "ruff format --check . produces zero changes"` ← backticks silently dropped
+
+- ridl.md: `Error alert includes a "Copy" button`
+- Correct JSON: `"criterion": "Error alert includes a \"Copy\" button"`
+- **Wrong** JSON: `"criterion": "Error alert includes a Copy button"` ← quotes silently dropped
+
+This is a common LLM error — when converting between formats, inline formatting characters get silently dropped because they look like presentation markup rather than content. They are content. Copy them verbatim.
+
 1. **Each iteration definition becomes one JSON entry** in the `"iterationDefinitions"` array
 2. **IDs**: Sequential (ID-001, ID-002, etc.)
 3. **Priority**: Based on dependency order, then document order
@@ -419,10 +431,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
         { "criterion": "Generate and run migration successfully", "status": "not_started" },
         { "criterion": "Tests written for FR-1 (failing before implementation, passing after)", "status": "not_started" },
         { "criterion": "Full test suite passes with no regressions", "status": "not_started" },
-        { "criterion": "ruff format --check . produces zero changes", "status": "not_started" },
-        { "criterion": "ruff check . passes with zero warnings", "status": "not_started" },
-        { "criterion": "mypy . passes", "status": "not_started" },
-        { "criterion": "python -m build succeeds with no errors or warnings", "status": "not_started" }
+        { "criterion": "`ruff format --check .` produces zero changes", "status": "not_started" },
+        { "criterion": "`ruff check .` passes with zero warnings", "status": "not_started" },
+        { "criterion": "`mypy .` passes", "status": "not_started" },
+        { "criterion": "`python -m build` succeeds with no errors or warnings", "status": "not_started" }
       ],
       "milestone": "MS-1",
       "priority": 1,
@@ -441,10 +453,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
         { "criterion": "Badge colors: gray=pending, blue=in_progress, green=done", "status": "not_started" },
         { "criterion": "Tests written for FR-2 and FR-3 (failing before implementation, passing after)", "status": "not_started" },
         { "criterion": "Full test suite passes with no regressions", "status": "not_started" },
-        { "criterion": "ruff format --check . produces zero changes", "status": "not_started" },
-        { "criterion": "ruff check . passes with zero warnings", "status": "not_started" },
-        { "criterion": "mypy . passes", "status": "not_started" },
-        { "criterion": "python -m build succeeds with no errors or warnings", "status": "not_started" },
+        { "criterion": "`ruff format --check .` produces zero changes", "status": "not_started" },
+        { "criterion": "`ruff check .` passes with zero warnings", "status": "not_started" },
+        { "criterion": "`mypy .` passes", "status": "not_started" },
+        { "criterion": "`python -m build` succeeds with no errors or warnings", "status": "not_started" },
         { "criterion": "Verify in browser using dev-browser skill", "status": "not_started" }
       ],
       "milestone": "MS-1",
@@ -464,10 +476,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
         { "criterion": "UI updates without page refresh", "status": "not_started" },
         { "criterion": "Tests written for FR-4 (failing before implementation, passing after)", "status": "not_started" },
         { "criterion": "Full test suite passes with no regressions", "status": "not_started" },
-        { "criterion": "ruff format --check . produces zero changes", "status": "not_started" },
-        { "criterion": "ruff check . passes with zero warnings", "status": "not_started" },
-        { "criterion": "mypy . passes", "status": "not_started" },
-        { "criterion": "python -m build succeeds with no errors or warnings", "status": "not_started" },
+        { "criterion": "`ruff format --check .` produces zero changes", "status": "not_started" },
+        { "criterion": "`ruff check .` passes with zero warnings", "status": "not_started" },
+        { "criterion": "`mypy .` passes", "status": "not_started" },
+        { "criterion": "`python -m build` succeeds with no errors or warnings", "status": "not_started" },
         { "criterion": "Verify in browser using dev-browser skill", "status": "not_started" }
       ],
       "milestone": "MS-2",
@@ -486,10 +498,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
         { "criterion": "Filter persists in URL params", "status": "not_started" },
         { "criterion": "Tests written for FR-5 (failing before implementation, passing after)", "status": "not_started" },
         { "criterion": "Full test suite passes with no regressions", "status": "not_started" },
-        { "criterion": "ruff format --check . produces zero changes", "status": "not_started" },
-        { "criterion": "ruff check . passes with zero warnings", "status": "not_started" },
-        { "criterion": "mypy . passes", "status": "not_started" },
-        { "criterion": "python -m build succeeds with no errors or warnings", "status": "not_started" },
+        { "criterion": "`ruff format --check .` produces zero changes", "status": "not_started" },
+        { "criterion": "`ruff check .` passes with zero warnings", "status": "not_started" },
+        { "criterion": "`mypy .` passes", "status": "not_started" },
+        { "criterion": "`python -m build` succeeds with no errors or warnings", "status": "not_started" },
         { "criterion": "Verify in browser using dev-browser skill", "status": "not_started" }
       ],
       "milestone": "MS-2",
@@ -542,6 +554,7 @@ Before writing ridl/ridl.json, verify:
 - [ ] Every iteration definition lists all 5 verification commands from universal context (test, format, lint, typecheck, build)
 - [ ] UI iteration definitions have "Verify in browser using dev-browser skill" as criterion
 - [ ] Acceptance criteria are verifiable (not vague)
+- [ ] **Criterion strings preserve all literal characters** — backticks, quotes, and inline formatting from ridl.md copied verbatim into JSON strings
 - [ ] Acceptance criteria use object format with `"criterion"` and `"status"` fields
 - [ ] All new criteria initialized to `"status": "not_started"`
 - [ ] No iteration definition depends on a later one

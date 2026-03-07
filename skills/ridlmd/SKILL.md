@@ -1,6 +1,6 @@
 ---
 name: ridlmd
-version: 3.0.0
+version: 3.0.1
 description: "Convert a comprehensive PRD into an agent-sized ridl.md with iteration definitions for the RIDL autonomous agent loop. Each iteration definition encompasses a user story and verifiable acceptance criteria. This skill should be used when the user asks to 'convert prd to ridl', 'create ridl.md', 'make ridl iterations from prd', 'ridl md', 'break prd into iterations', 'convert prd to iteration definitions', 'break prd into stories', or 'convert prd to user stories'. Reads a comprehensive PRD and distills it into small, agent-sized iteration definitions."
 user-invocable: true
 ---
@@ -128,10 +128,13 @@ Extract universal context into a **Universal Context** section in the output. Ev
 
 Iteration definitions must be ordered so earlier ones never depend on later ones:
 
-1. Schema/database changes (migrations)
-2. Server actions / backend logic
-3. UI components that use the backend
-4. Dashboard/summary views that aggregate data
+1. **Project scaffolding** (almost always first — see below)
+2. Schema/database changes (migrations)
+3. Server actions / backend logic
+4. UI components that use the backend
+5. Dashboard/summary views that aggregate data
+
+**The first iteration definition should almost always be project scaffolding:** initialize the project structure, build system, dependencies, `.gitignore`, linter/formatter config, and a minimal "hello world" that builds and passes all verification commands. This ensures every subsequent iteration starts from a working foundation. Without it, the first real feature iteration wastes context on setup and is more likely to fail.
 
 ### Milestone Assignment
 

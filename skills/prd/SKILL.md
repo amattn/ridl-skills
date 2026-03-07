@@ -1,6 +1,6 @@
 ---
 name: prd
-version: 3.0.0
+version: 3.0.1
 description: "Generate a comprehensive Product Requirements Document (PRD). This skill should be used when the user asks to 'create a prd', 'write a prd', 'plan this feature', 'write requirements for', 'spec out', 'create a product spec', or 'write a requirements doc'. Produces detailed, human-readable PRDs with requirement tables, technical architecture, user flows, and release milestones."
 user-invocable: true
 ---
@@ -187,6 +187,7 @@ Errors shown to users must be clear, actionable, and copy-friendly. Requirements
 - A one-click "Copy error details" button that copies the error code, message, and relevant context to the clipboard for easy pasting into bug reports or search
 - Errors distinguish between user-correctable problems and internal failures
 - Error strings are greppable — unique enough to locate the exact throw site in the codebase
+- **Debug numbers:** Every error string includes a unique, random 12-digit positive integer called a "debug number" (e.g., `[814209375142]`). Debug numbers are hard-coded at the throw site and never reused across the codebase, making every error instantly greppable to its exact source location. They are easy to copy-paste into bug reports, search queries, or agent prompts. This is far more reliable than error messages alone, which may be duplicated or localized
 
 **6.2 Debuggability**
 
@@ -195,6 +196,7 @@ Define how the product supports runtime inspection and troubleshooting:
 - A **Debug Mode** toggle in Settings that enables additional diagnostic UI (e.g., a debug info pane or overlay window showing internal state, recent events, and timing data)
 - Structured logging with severity levels and consistent key-value formatting that is parseable by both humans and tools
 - Sufficient log context to diagnose issues from logs alone without requiring a debugger session
+- **Debug numbers in logs:** Every structured log call includes a hard-coded debug number (same 12-digit positive integer convention as error strings). This makes log lines greppable to their exact source location, which is invaluable for both human debugging in Console.app / log aggregators and for coding agents searching the codebase
 
 **6.3 Build Identification & Version Tracking**
 
@@ -224,11 +226,12 @@ Define standards that make the codebase easy to navigate for humans and effectiv
 | DX-2 | Settings includes a Debug Mode toggle that enables a debug info pane showing internal state and recent events | P1 |
 | DX-3 | All log output uses structured key-value format with severity levels | P1 |
 | DX-4 | Public module APIs have doc comments covering purpose, parameters, and return values | P1 |
-| DX-5 | Error strings are unique and greppable to locate the exact throw site in source | P1 |
-| DX-6 | All code must pass the project linter and formatter with zero warnings; enforced via CI pre-merge check | P0 |
-| DX-7 | Application version is displayed via --version flag (CLI), About pane or settings window (GUI), or settings/config page (web) | P0 |
-| DX-8 | Application version is printed to log output on startup | P1 |
-| DX-9 | Version follows semver; milestone defines minor version, each iteration increments patch (e.g., MS-1 v0.1 → v0.1.0, v0.1.1, v0.1.2) | P0 |
+| DX-5 | Every error string includes a unique, random 12-digit positive integer debug number (e.g., `[814209375142]`) assigned at the throw site, never reused across the codebase | P1 |
+| DX-6 | Every structured log call includes a hard-coded debug number (same 12-digit convention) for greppability | P1 |
+| DX-7 | All code must pass the project linter and formatter with zero warnings; enforced via CI pre-merge check | P0 |
+| DX-8 | Application version is displayed via --version flag (CLI), About pane or settings window (GUI), or settings/config page (web) | P0 |
+| DX-9 | Application version is printed to log output on startup | P1 |
+| DX-10 | Version follows semver; milestone defines minor version, each iteration increments patch (e.g., MS-1 v0.1 → v0.1.0, v0.1.1, v0.1.2) | P0 |
 ```
 
 **ID Prefix:** DX = Developer Experience.
@@ -260,6 +263,8 @@ Break the project into incremental releases:
 ```
 
 Each milestone should be a shippable increment. Earlier milestones contain P0 requirements; later milestones add P1/P2 features.
+
+**The first milestone should almost always start with project scaffolding** — initializing the project structure, build system, dependencies, `.gitignore`, linter/formatter config, and a minimal "hello world" that builds and passes all verification commands. This ensures the foundation is solid before any feature work begins. Scaffolding is not glamorous but skipping it causes cascading problems in every subsequent iteration.
 
 **Milestone fields:**
 - **Version** (required): Semver label in the heading (e.g., `v0.1`)
@@ -397,7 +402,24 @@ Choose the formatter that matches the project's stack. If the project already us
 
 **ID Prefix:** TV = Testing & Verification.
 
-### 13. Success Metrics
+### 13. Future Considerations
+
+A table documenting items noted for potential future development that are explicitly **not in scope** for any current milestone. This section captures good ideas, user requests, and natural extensions that should be remembered but not acted on yet.
+
+This prevents scope creep during development while ensuring valuable ideas aren't lost. It also signals to coding agents that these items should not be implemented unless a future milestone explicitly includes them.
+
+```markdown
+| # | Area | Description |
+|---|------|-------------|
+| 1 | [Short area name] | [Brief description of the potential future capability] |
+| 2 | [Short area name] | [Brief description] |
+```
+
+Items may graduate from Future Considerations into a new milestone when the PRD is updated. When that happens, remove them from this table and add corresponding requirements and milestone entries.
+
+If there are no future considerations yet, include the section with a note: "No future considerations at this time."
+
+### 14. Success Metrics
 
 A table with columns: Metric, Target.
 
@@ -484,6 +506,32 @@ After the critical test areas review, present the testing & verification strateg
 
 Are the verification commands and coverage expectations right for this project?
 (Reply "ok" to approve as-is)
+```
+
+### Final Review
+
+Before saving, walk the user through three closing checks:
+
+1. **Consistency pass:** Review the full PRD for internal consistency — do requirement IDs, section numbering, milestone contents, and cross-references all line up? Flag any mismatches and fix them.
+
+2. **Recommendations:** Offer any recommendations based on the PRD as a whole — patterns you noticed, potential gaps between sections, requirements that might conflict, areas that feel underspecified, or structural improvements. Ask the user if they want to incorporate any of them.
+
+3. **Open questions:** Review the PRD with fresh eyes and ask the user if there are any open questions that may have been missed — design decisions that were assumed but never confirmed, edge cases that aren't covered, or ambiguities that could cause problems during implementation.
+
+```
+### Final Review
+
+1. **Consistency pass** — I've checked the full PRD for internal consistency.
+   [List any issues found, or "No issues found."]
+
+2. **Recommendations** — Based on the PRD as a whole:
+   [List any recommendations, or "No recommendations."]
+
+3. **Open questions** — Can you think of any open questions we may have missed?
+   [List any candidates you spotted, or "None from my side."]
+
+Anything to address before saving?
+(Reply "ok" to finalize)
 ```
 
 ### Emergent Items Triage
@@ -589,7 +637,9 @@ Before saving the PRD:
 - [ ] Critical test areas identified and reviewed with user
 - [ ] Testing & verification strategy defines red/green discipline, coverage expectations, and runnable verification commands
 - [ ] Every functional requirement has a path to automated test coverage
+- [ ] Future considerations section captures out-of-scope ideas without committing to them
 - [ ] Per-feature acceptance criteria reviewed with user
+- [ ] Final review: consistency pass, recommendations, and open questions check completed with user
 - [ ] Saved to `ridl/prd.md`
 
 After saving:

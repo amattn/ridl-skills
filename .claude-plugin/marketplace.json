@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "PRD & prompt generation skills for the Ralph Loop inspired RIDL autonomous agent system",
-    "version": "3.0.0"
+    "version": "3.0.1"
   },
   "plugins": [
     {
       "name": "ridl-skills",
       "source": "./",
       "description": "PRD & prompt generation skills for the Ralph Loop inspired RIDL autonomous agent system",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "keywords": ["ridl", "prd", "automation", "agent", "planning", "requirements"],
       "category": "productivity",
       "skills": "./skills/"
