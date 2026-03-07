@@ -1,6 +1,6 @@
 ---
 name: ridlmd
-version: 2.1.1
+version: 2.2.0
 description: "Convert a comprehensive PRD into an agent-sized ridl.md with iteration definitions for the RIDL autonomous agent loop. Each iteration definition encompasses a user story and verifiable acceptance criteria. This skill should be used when the user asks to 'convert prd to ridl', 'create ridl.md', 'make ridl iterations from prd', 'ridl md', 'break prd into iterations', 'convert prd to iteration definitions', 'break prd into stories', or 'convert prd to user stories'. Reads a comprehensive PRD and distills it into small, agent-sized iteration definitions."
 user-invocable: true
 ---
@@ -327,9 +327,10 @@ The ridl.md reader is an AI agent. Therefore:
 This skill is step 2 in the RIDL pipeline. All files live in the `ridl/` directory:
 
 ```
-/ridl-skills:prd      →  ridl/prd.md      (comprehensive PRD)
-/ridl-skills:ridlmd   →  ridl/ridl.md     (agent-sized iteration definitions)  ← you are here
-/ridl-skills:ridljson  →  ridl/ridl.json   (JSON for autonomous loop)
+/ridl-skills:prd        →  ridl/prd.md              (comprehensive PRD)
+/ridl-skills:ridlmd     →  ridl/ridl.md             (agent-sized iteration definitions)  ← you are here
+/ridl-skills:ridljson   →  ridl/ridl.json           (JSON for autonomous loop)
+/ridl-skills:ridlprompts →  ridl/prompts/*.liquid    (harness prompt templates)
 ```
 
 ---

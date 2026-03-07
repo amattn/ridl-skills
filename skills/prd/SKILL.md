@@ -505,9 +505,10 @@ Create the `ridl/` directory if it does not exist.
 This skill is step 1 in the RIDL pipeline. All files live in `ridl/`:
 
 ```
-/ridl-skills:prd      →  ridl/prd.md      (comprehensive PRD)  ← you are here
-/ridl-skills:ridlmd   →  ridl/ridl.md     (agent-sized iteration definitions)
-/ridl-skills:ridljson  →  ridl/ridl.json   (JSON for autonomous loop)
+/ridl-skills:prd        →  ridl/prd.md              (comprehensive PRD)  ← you are here
+/ridl-skills:ridlmd     →  ridl/ridl.md             (agent-sized iteration definitions)
+/ridl-skills:ridljson   →  ridl/ridl.json           (JSON for autonomous loop)
+/ridl-skills:ridlprompts →  ridl/prompts/*.liquid    (harness prompt templates)
 ```
 
 ---

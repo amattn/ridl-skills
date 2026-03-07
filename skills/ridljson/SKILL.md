@@ -1,6 +1,6 @@
 ---
 name: ridljson
-version: 2.1.1
+version: 2.2.0
 description: "Convert ridl.md to ridl.json format for the RIDL autonomous agent system. This skill should be used when the user asks to 'convert ridl.md', 'turn this into ridl json', 'create ridl.json', 'ridl json', 'convert ridl.md to json', or 'make ridl iterations from ridl.md'."
 user-invocable: true
 ---
@@ -473,9 +473,10 @@ Cross-cutting requirements that apply to ALL iteration definitions.
 This skill is step 3 in the RIDL pipeline. All files live in the `ridl/` directory:
 
 ```
-/ridl-skills:prd      →  ridl/prd.md      (comprehensive PRD)
-/ridl-skills:ridlmd   →  ridl/ridl.md     (agent-sized iteration definitions)
-/ridl-skills:ridljson  →  ridl/ridl.json   (JSON for autonomous loop)  ← you are here
+/ridl-skills:prd        →  ridl/prd.md              (comprehensive PRD)
+/ridl-skills:ridlmd     →  ridl/ridl.md             (agent-sized iteration definitions)
+/ridl-skills:ridljson   →  ridl/ridl.json           (JSON for autonomous loop)  ← you are here
+/ridl-skills:ridlprompts →  ridl/prompts/*.liquid    (harness prompt templates)
 ```
 
 ---

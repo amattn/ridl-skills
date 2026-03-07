@@ -4,15 +4,15 @@
     "name": "amattn"
   },
   "metadata": {
-    "description": "PRD generation and conversion skills for the RIDL autonomous agent system",
-    "version": "1.0.1"
+    "description": "PRD generation skills for the Ralph Loop inspired RIDL autonomous agent system",
+    "version": "1.1.0"
   },
   "plugins": [
     {
       "name": "ridl-skills",
       "source": "./",
-      "description": "PRD generation and conversion skills for the RIDL autonomous agent loop",
-      "version": "2.1.1",
+      "description": "PRD generation skills for the Ralph Loop inspired RIDL autonomous agent system",
+      "version": "2.2.0",
       "keywords": ["ridl", "prd", "automation", "agent", "planning"],
       "category": "productivity",
       "skills": "./skills/"
